@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FindFun.Server.Shared.File;
+using System.ComponentModel.DataAnnotations;
 
 namespace FindFun.Server.Features.Parks.Create;
 
@@ -38,4 +39,10 @@ public record CreateParkRequest(
 
     [StringLength(5, MinimumLength = 5)]
      string? PostalCode
-);
+) : IValidatableObject
+{
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        return FileValidation.ValidateFiles(ParkImages);
+    }
+}

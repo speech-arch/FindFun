@@ -1,4 +1,3 @@
-using FindFun.Server.Domain;
 using FindFun.Server.Shared;
 using FindFun.Server.Shared.Validations;
 using FluentAssertions;
@@ -14,7 +13,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
 {
     private readonly WebAplicationCustomFactory _factory;
     private readonly HttpClient _httpClient;
-    private const string BadHttpRequestException = "Microsoft.AspNetCore.Http.BadHttpRequestException";
+    private const string BadRequest = "Bad Request";
     public CreateParkIntegrationTests(WebAplicationCustomFactory factory)
     {
         _factory = factory;
@@ -28,7 +27,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
         var validationProblemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         validationProblemDetails.Should().NotBeNull();
         validationProblemDetails.Status.Should().Be((int)response.StatusCode);
-        validationProblemDetails.Title.Should().Be(BadHttpRequestException);
+        validationProblemDetails.Title.Should().Be(BadRequest);
         validationProblemDetails.Type.Should().Be(ProblemDetailsConstants.BadRequest);
     }
     [Fact]
@@ -44,7 +43,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
         var validationProblemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         validationProblemDetails.Should().NotBeNull();
         validationProblemDetails.Status.Should().Be((int)response.StatusCode);
-        validationProblemDetails.Title.Should().Be(BadHttpRequestException);
+        validationProblemDetails.Title.Should().Be(BadRequest);
     }
 
     [Theory]
@@ -72,7 +71,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
         var validationProblemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         validationProblemDetails.Should().NotBeNull();
         validationProblemDetails.Status.Should().Be((int)response.StatusCode);
-        validationProblemDetails.Title.Should().Be("Bad Request");
+        validationProblemDetails.Title.Should().Be(BadRequest);
         validationProblemDetails!.Errors.Should().ContainKey("Locality").And.HaveCount(1);
         var localityErrors = validationProblemDetails.Errors["Locality"];
         localityErrors.Should().HaveCount(1).And.Contain("Locality not found.");

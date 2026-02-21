@@ -58,6 +58,25 @@ public class WebAplicationCustomFactory : WebApplicationFactory<IServerMaker>, I
                    ])
                ));
     }
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment("Development");
+        builder.ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+        });
+
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll(typeof(FindFunDbContext));
+            services.AddDbContext<FindFunDbContext>(options =>
+            {
+                options.UseNpgsql(postgresContainer.GetConnectionString(), npgsqlOptions => npgsqlOptions.UseNetTopologySuite());
+            });
+            services.RemoveAll(typeof(BlobServiceClient));
+            services.AddSingleton(sp => new BlobServiceClient(azuriteContainer.GetConnectionString()));
+        });
+    }
 
     public async Task<Park?> GetParkByIdAsync(int id)
     {
@@ -87,7 +106,7 @@ public class WebAplicationCustomFactory : WebApplicationFactory<IServerMaker>, I
         var municipality = _dbContext?.Municipalities.First(m => m.OfficialNa6 == municipalityName);
 
         var street = new Street("Main Street", municipality!.Gid);
-        await _dbContext.Streets.AddAsync(street);
+        await _dbContext!.Streets.AddAsync(street);
         var address = new Address("Some formatted address", "12345", street, -3.70379, 40.41678, "1");
         await _dbContext.Addresses.AddAsync(address);
         var park = new Park("Existing Park", "desc", address, 5.00m, false, "Tester", "Public", "ABC123");
@@ -102,26 +121,6 @@ public class WebAplicationCustomFactory : WebApplicationFactory<IServerMaker>, I
         _scope = Services.CreateScope();
         _dbContext = _scope.ServiceProvider.GetRequiredService<FindFunDbContext>();
     }
-
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        builder.ConfigureLogging(logging =>
-        {
-            logging.ClearProviders();
-        });
-
-        builder.ConfigureTestServices(services =>
-        {
-            services.RemoveAll(typeof(FindFunDbContext));
-            services.AddDbContext<FindFunDbContext>(options =>
-            {
-                options.UseNpgsql(postgresContainer.GetConnectionString(), npgsqlOptions => npgsqlOptions.UseNetTopologySuite());
-            });
-            services.RemoveAll(typeof(BlobServiceClient));
-            services.AddSingleton(sp => new BlobServiceClient(azuriteContainer.GetConnectionString()));
-        });
-    }
-
     async Task IAsyncLifetime.DisposeAsync()
     {
         _scope?.Dispose();

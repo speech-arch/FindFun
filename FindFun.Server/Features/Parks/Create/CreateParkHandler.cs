@@ -9,15 +9,9 @@ namespace FindFun.Server.Features.Parks.Create;
 
 public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHandler> logger)
 {
-    // this should return the image urls and the id of the created park
+    // this should return the image urls and the id of the created park 
     public async Task<Result<int>> HandleAsync(CreateParkRequest request, FileUpLoad fileUpLoad, CancellationToken cancellationToken)
     {
-        var fileValidationResult = FileValidation.ValidateFiles(request.ParkImages).ToList();
-        if (fileValidationResult.Count != 0)
-        {
-            var validationResult = fileValidationResult.First();
-            return StatusCodes.Status400BadRequest.CreateProblemResult<CreateParkRequest, int>(validationResult.MemberNames.FirstOrDefault()!, validationResult.ErrorMessage!);
-        }
         // use transaction
         var entranceFee = ValidationHelper.ValidateEntrance(request.IsFree, request.EntranceFee);
         if (!entranceFee.IsValid)
