@@ -15,9 +15,13 @@ public class ParkAmenityConfiguration : IEntityTypeConfiguration<ParkAmenity>
         builder.Property(x => x.AmenityId).HasColumnName("amenity_id");
         builder.HasOne(x => x.Park)
             .WithMany(x => x.Amenities)
-            .HasForeignKey(x => x.ParkId);
+            .HasForeignKey(x => x.ParkId)
+            .IsRequired();
+
         builder.HasOne(x => x.Amenity)
             .WithMany(x => x.ParkAmenities)
-            .HasForeignKey(x => x.AmenityId);
+            .HasForeignKey(x => x.AmenityId)
+            .IsRequired();
+
     }
 }

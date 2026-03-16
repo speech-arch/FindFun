@@ -117,60 +117,53 @@ const cascadeCategoryOptions = [
     label: 'Park Type',
     value: 'parkType',
     children: [
-      { 
-        label: 'National', 
-        value: 'national',
-        children: [
-          { label: 'Ascending', value: { type: 'parkType', value: 'national', order: 'asc' } },
-          { label: 'Descending', value: { type: 'parkType', value: 'national', order: 'desc' } },
-        ]
-      },
-      { 
-        label: 'Urban', 
-        value: 'urban',
-        children: [
-          { label: 'Ascending', value: { type: 'parkType', value: 'urban', order: 'asc' } },
-          { label: 'Descending', value: { type: 'parkType', value: 'urban', order: 'desc' } },
-        ]
-      },
-      { 
-        label: 'Nature', 
-        value: 'nature',
-        children: [
-          { label: 'Ascending', value: { type: 'parkType', value: 'nature', order: 'asc' } },
-          { label: 'Descending', value: { type: 'parkType', value: 'nature', order: 'desc' } },
-        ]
-      },
+      { label: 'National', value: { type: 'parkType', parkType: 'national' } },
+      { label: 'Urban', value: { type: 'parkType', parkType: 'urban' } },
+      { label: 'Nature', value: { type: 'parkType', parkType: 'nature' } },
     ],
   },
   {
     label: 'Distance',
     value: 'distance',
     children: [
-      { label: '1km', value: { type: 'distance', value: 1, order: 'asc' } },
-      { label: '5km', value: { type: 'distance', value: 5, order: 'asc' } },
-      { label: '10km', value: { type: 'distance', value: 10, order: 'asc' } },
+      { label: '1km', value: { type: 'distance', distance: 1 } },
+      { label: '5km', value: { type: 'distance', distance: 5 } },
+      { label: '10km', value: { type: 'distance', distance: 10 } },
+      { label: '50km', value: { type: 'distance', distance: 50 } },
+      { label: '100km', value: { type: 'distance', distance: 100 } },
     ],
   },
   {
     label: 'Rating',
-    value: 'rating',
-    children: [
-      { label: 'Ascending', value: { type: 'rating', order: 'asc' } },
-      { label: 'Descending', value: { type: 'rating', order: 'desc' } },
-    ],
+    value: { type: 'rating' },
   },
   {
     label: 'Amenities',
     value: 'amenities',
     children: [
-      { label: 'Playground', value: { type: 'amenities', value: ['playground'] } },
-      { label: 'Restrooms', value: { type: 'amenities', value: ['restrooms'] } },
-      { label: 'Parking', value: { type: 'amenities', value: ['parking'] } },
-      { label: 'Picnic Area', value: { type: 'amenities', value: ['picnic_area'] } },
-      { label: 'Sports Field', value: { type: 'amenities', value: ['sports_field'] } },
-      { label: 'Walking Trail', value: { type: 'amenities', value: ['walking_trail'] } },
+      { label: 'Playground', value: { type: 'amenities', amenities: ['playground'] } },
+      { label: 'Restrooms', value: { type: 'amenities', amenities: ['restrooms'] } },
+      { label: 'Parking', value: { type: 'amenities', amenities: ['parking'] } },
+      { label: 'Picnic Area', value: { type: 'amenities', amenities: ['picnic_area'] } },
+      { label: 'Sports Field', value: { type: 'amenities', amenities: ['sports_field'] } },
+      { label: 'Walking Trail', value: { type: 'amenities', amenities: ['walking_trail'] } },
     ],
+  },
+  {
+    label: 'Name',
+    value: 'name',
+  },
+  {
+    label: 'Location',
+    value: 'location',
+  },
+  {
+    label: 'Municipality',
+    value: 'municipality',
+  },
+  {
+    label: 'Province',
+    value: 'province',
   },
 ]
 
@@ -179,40 +172,9 @@ watch(cascadeCategoryKey, (newVal) => {
   emit('update:selectedCategories', newVal ? [newVal] : [])
 })
 
-// Hierarchical sort options for CascadeSelect
 const cascadeSortOptions = [
-  {
-    label: 'Name',
-    value: 'name',
-    children: [
-      { label: 'A to Z', value: { field: 'name', order: 'asc' } },
-      { label: 'Z to A', value: { field: 'name', order: 'desc' } },
-    ],
-  },
-  {
-    label: 'Location',
-    value: 'location',
-    children: [
-      { label: 'A to Z', value: { field: 'location', order: 'asc' } },
-      { label: 'Z to A', value: { field: 'location', order: 'desc' } },
-    ],
-  },
-  {
-    label: 'Municipality',
-    value: 'municipality',
-    children: [
-      { label: 'A to Z', value: { field: 'municipality', order: 'asc' } },
-      { label: 'Z to A', value: { field: 'municipality', order: 'desc' } },
-    ],
-  },
-  {
-    label: 'Province',
-    value: 'province',
-    children: [
-      { label: 'A to Z', value: { field: 'province', order: 'asc' } },
-      { label: 'Z to A', value: { field: 'province', order: 'desc' } },
-    ],
-  },
+  { label: 'A to Z', value: 'asc' },
+  { label: 'Z to A', value: 'desc' },
 ]
 
 const cascadeSortKey = ref(null)

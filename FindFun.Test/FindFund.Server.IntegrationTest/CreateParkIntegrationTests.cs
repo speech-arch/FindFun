@@ -1,4 +1,4 @@
-using FindFun.Server.Shared;
+using FindFun.Server.Features.Parks.Create;
 using FindFun.Server.Shared.Validations;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
     [Fact]
     public async Task CreatePark_ShouldReturnBadRequest_WhenNoDataProvided()
     {
-        var response = await _httpClient.PostAsync("/parks", new MultipartFormDataContent());
+        var response = await _httpClient.PostAsync("/api/parks", new MultipartFormDataContent());
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var validationProblemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         validationProblemDetails.Should().NotBeNull();
@@ -38,7 +38,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
             { new StringContent("Test Park"), "Name" },
             { new StringContent("A nice park"), "Description" }
         };
-        var response = await _httpClient.PostAsync("/parks", multipart);
+        var response = await _httpClient.PostAsync("/api/parks", multipart);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var validationProblemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         validationProblemDetails.Should().NotBeNull();
@@ -51,7 +51,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
     public async Task CreatePark_ShouldReturnBadRequest_WhenValidationFails(RequestCaseData requestCaseData)
     {
         var multipart = WebApplicationTestData.CreateBaseMultipart(string.Empty, requestCaseData);
-        var response = await _httpClient.PostAsync("/parks", multipart);
+        var response = await _httpClient.PostAsync("/api/parks", multipart);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var validationProblemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         validationProblemDetails.Should().NotBeNull();
@@ -65,7 +65,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
         var multipart = WebApplicationTestData.CreateBaseMultipart("NonExistentLocality", testCase);
         AddFiles(testCase.FormFieldName!, testCase.FileName!, testCase.FileBytes!, testCase.ContentType!, multipart);
 
-        var response = await _httpClient.PostAsync("/parks", multipart);
+        var response = await _httpClient.PostAsync("/api/parks", multipart);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var validationProblemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
@@ -84,9 +84,9 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
         HttpResponseMessage response = await PostAsync(requestCaseData);
         // Assert
         response.EnsureSuccessStatusCode();
-        var responseString = await response.Content.ReadAsStringAsync();
-        var createdId = JsonSerializer.Deserialize<int>(responseString);
-        createdId.Should().BeGreaterThan(0);
+        var createParkresponse = await response.Content.ReadFromJsonAsync<CreateParkResponse>();
+        createParkresponse.Should().NotBeNull();
+        createParkresponse.ParkId.Should().BeGreaterThan(0);
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
 
         var multipart = WebApplicationTestData.CreateBaseMultipart(_factory.MunicipalityName, requestCaseData);
         AddFiles("ParkImages", "image.png", [0x89, 0x50, 0x4E, 0x47], "image/png", multipart);
-        var response = await _httpClient.PostAsync("/parks", multipart);
+        var response = await _httpClient.PostAsync("/api/parks", multipart);
 
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         var validationProblemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
@@ -126,7 +126,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
 
         AddFiles(testCase.FormFieldName!, testCase.FileName!, testCase.FileBytes!, testCase.ContentType!, multipart);
 
-        var response = await _httpClient.PostAsync("/parks", multipart);
+        var response = await _httpClient.PostAsync("/api/parks", multipart);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var validationProblemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         validationProblemDetails.Should().NotBeNull();
@@ -149,10 +149,11 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
         var response = await PostAsync(requestWithSchedule);
 
         response.EnsureSuccessStatusCode();
-        var responseString = await response.Content.ReadAsStringAsync();
-        var createdId = JsonSerializer.Deserialize<int>(responseString);
-        createdId.Should().BeGreaterThan(0);
+        var createParkResponse = await response.Content.ReadFromJsonAsync<CreateParkResponse>();
 
+        createParkResponse.Should().NotBeNull();
+        createParkResponse.ParkId.Should().BeGreaterThan(0);
+        var createdId = createParkResponse.ParkId;
         var park = await _factory.GetParkByIdAsync(createdId);
 
         park.Should().NotBeNull("park should be created and retrievable from DB");
@@ -168,7 +169,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
         await _factory.AddMunicipality();
         var multipart = WebApplicationTestData.CreateBaseMultipart(_factory.MunicipalityName, requestCase);
         AddFiles(requestCase.FormFieldName!, requestCase.FileName!, requestCase.FileBytes!, requestCase.ContentType!, multipart);
-        var response = await _httpClient.PostAsync("/parks", multipart);
+        var response = await _httpClient.PostAsync("/api/parks", multipart);
         return response;
     }
 

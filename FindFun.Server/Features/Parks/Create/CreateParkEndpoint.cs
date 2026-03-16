@@ -1,6 +1,4 @@
-﻿using FindFun.Server.Shared;
-using FindFun.Server.Shared.File;
-using FindFun.Server.Shared.Validations;
+﻿using FindFun.Server.Shared.File;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FindFun.Server.Features.Parks.Create;
@@ -9,10 +7,11 @@ public static class CreateParkEndpoint
 {
     public static void MapCreateParkEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost("", async (CreateParkHandler handler, FileUpLoad fileUpLoad, [FromForm] CreateParkRequest request, CancellationToken cancellationToken) =>
+        app.MapPost("/", async (CreateParkHandler handler, FileUpLoad fileUpLoad, [FromForm] CreateParkRequest request, CancellationToken cancellationToken) =>
         {
+            // should return the id of the created park and use CreatedAtRoute instead of OK
             var result = await handler.HandleAsync(request, fileUpLoad, cancellationToken);
-            return result.IsValid ? Results.Ok(result.Data) : Results.Problem(result!.ProblemDetails!);
+            return result.IsValid ? Results.CreatedAtRoute("GetPark", new { parkId = result?.Data?.ParkId }, result?.Data) : Results.Problem(result!.ProblemDetails!);
         })
         .WithName("CreatePark")
         .WithTags("Parks").DisableAntiforgery();

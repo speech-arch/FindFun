@@ -39,7 +39,6 @@ defineProps({
   fields: {
     type: Array,
     required: true,
-    // [{ icon: 'pi pi-map-marker', valueKey: 'location', label: 'Location', format: (val, item) => val }]
   },
 })
 </script>

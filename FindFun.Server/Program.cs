@@ -1,14 +1,17 @@
 using FindFun.Server.Features.Parks;
 using FindFun.Server.Features.Parks.Create;
+using FindFun.Server.Features.Parks.Get;
 using FindFun.Server.Infrastructure;
 using FindFun.Server.Shared.File;
 using FindFun.Server.Shared.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<FileUpLoad>();
+builder.Services.AddScoped<FileUpLoad>()
+    .AddScoped<CreateParkHandler>()
+    .AddScoped<GetParkHandler>()
+    .AddScoped<GetParksHandler>();
 
-builder.Services.AddScoped<CreateParkHandler>();
 builder.Services.AddSingleton<GlobalExceptionHandler>();
 builder.AddServiceDefaults()
     .AddConnectionStrings()

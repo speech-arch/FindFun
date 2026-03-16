@@ -1,4 +1,5 @@
 ﻿using FindFun.Server.Shared.File;
+using FindFun.Server.Shared.Validations;
 using System.ComponentModel.DataAnnotations;
 
 namespace FindFun.Server.Features.Parks.Create;
@@ -43,6 +44,12 @@ public record CreateParkRequest(
 {
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+
+        var entranceResult = ValidationHelper.EntranceValidation(IsFree, EntranceFee);
+        if (entranceResult != ValidationResult.Success)
+            return [entranceResult];
+
         return FileValidation.ValidateFiles(ParkImages);
     }
 }
+public sealed record CreateParkResponse(int ParkId, IReadOnlyList<string> ImageUrls);

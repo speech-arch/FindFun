@@ -10,4 +10,7 @@ public class ConnectionStrings
     [Required]
     [MinLength(1)]
     public string Blobs { get; init; } = default!;
+    [Required]
+    [MinLength(1)]
+    public string ContainerName { get; set; } = default!;
 }

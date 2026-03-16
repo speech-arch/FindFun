@@ -1,15 +1,14 @@
 import { ref, watch, toRaw, type Ref } from 'vue'
 import { useParksStore, type GetParksParams, type GetEventsParams } from '@/stores/data'
 
-// Map to backend sort field names for parks
-const parksSortFieldMap: Record<string, 'name' | 'location' | 'municipality' | 'province'> = {
+const parksSortFieldMap: Record<string, 'name' | 'location' | 'municipality' | 'province' | 'rating'> = {
   name: 'name',
   location: 'location',
   municipality: 'municipality',
   province: 'province',
+  rating: 'rating',
 }
 
-// Map to backend sort field names for events
 const eventsSortFieldMap: Record<string, 'title' | 'starttime' | 'endtime' | 'location'> = {
   title: 'title',
   name: 'title',
@@ -24,77 +23,43 @@ function addSortToParams(
   sortOrder?: 1 | -1,
   isEvent = false,
 ) {
-  if (sortKey && typeof sortKey === 'object') {
-    const rawData = toRaw(sortKey)
-
-    if (rawData.value && typeof rawData.value === 'object') {
-      const map = isEvent ? eventsSortFieldMap : parksSortFieldMap
-      const mapped = map[rawData.value.field as keyof typeof map]
-
-      if (mapped) {
-        params.sortBy = mapped
-        params.sortDirection = rawData.value.order
-        console.log('Params after cascade sort:', params)
-      }
-      return
-    }
-  }
-
   let extracted: unknown = sortKey
 
-  if (
-    extracted &&
-    typeof extracted === 'object' &&
-    'value' in extracted &&
-    !Array.isArray(extracted)
-  ) {
+  if (extracted && typeof extracted === 'object' && 'value' in extracted && !Array.isArray(extracted)) {
     extracted = (extracted as { value?: unknown }).value
-    if (
-      extracted &&
-      typeof extracted === 'object' &&
-      'value' in extracted &&
-      !Array.isArray(extracted)
-    ) {
-      extracted = (extracted as { value?: unknown }).value
-    }
   }
 
-  if (!extracted || typeof extracted !== 'string') {
-    return
-  }
+  if (!extracted || typeof extracted !== 'string') return
 
   const map = isEvent ? eventsSortFieldMap : parksSortFieldMap
   const mapped = map[extracted.toLowerCase().trim() as keyof typeof map]
-
+  console.log('Mapped sort key:', { extracted, mapped, sortKey, sortOrder })
   if (mapped) {
     params.sortBy = mapped
     params.sortDirection = sortOrder === 1 ? 'asc' : 'desc'
   }
 }
 
-// Process cascade filter data and add to params
-function addCascadeFilterToParams(params: GetParksParams | GetEventsParams, filterData: any) {
+function addCascadeFilterToParams(params: GetParksParams | GetEventsParams, filterData: Any) {
   if (!filterData || typeof filterData !== 'object') return
 
-  const rawData = toRaw(filterData)
-  const { value } = rawData
-  console.log('Params after cascade filter:', value)
+  const value = toRaw(filterData).value
+  console.log('Processing cascade filter:', { filterData, value })
+  if (!value || typeof value !== 'object') return
+
   switch (value.type) {
     case 'parkType':
-      ;(params as any).parkType = value.type
-      if (value.order) params.sortDirection = value.order
+      ;(params as GetParksParams).parkType = value.parkType
       break
     case 'distance':
-      ;(params as any).radiusKm = value.distance
-      if (value.order) params.sortDirection = value.order
+      ;(params as GetParksParams).radiusKm = value.distance
       break
     case 'rating':
-      ;(params as any).sortBy = 'rating'
-      if (value.order) params.sortDirection = value.order
+      ;(params as GetParksParams).sortBy = 'rating'
       break
     case 'amenities':
       if (Array.isArray(value.amenities) && value.amenities.length > 0) {
-        ;(params as any).amenities = value.amenities
+        ;(params as GetParksParams).amenities = value.amenities
       }
       break
   }
@@ -153,18 +118,19 @@ export function useSearchFilter(options: UseSearchFilterOptions) {
 
       if (searchTerm.value.trim()) params.search = searchTerm.value.trim()
 
-      addSortToParams(params, sortKey.value, sortOrder.value, false)
+      const rawFilter = selectedFilters.value ? toRaw(selectedFilters.value) : null
+      const rawSort = sortKey.value ? toRaw(sortKey.value) : null
+      const isPlainField = rawFilter?.value && parksSortFieldMap[String(rawFilter.value)]
+      const effectiveSortKey = isPlainField ? String(rawFilter.value) : rawSort ? 'name' : null
+      const effectiveSortOrder: 1 | -1 = rawSort?.value === 'desc' ? -1 : 1
 
-      // Process cascade filter if provided
-      if (selectedFilters.value) {
-        addCascadeFilterToParams(params, selectedFilters.value)
-      }
+      if (effectiveSortKey) addSortToParams(params, effectiveSortKey, effectiveSortOrder, false)
+      if (rawFilter && !isPlainField) addCascadeFilterToParams(params, selectedFilters.value)
 
       await executeSearch(false, params)
     }
   }
 
-  // Watch for changes and trigger API calls
   watch(
     [
       sortKey,

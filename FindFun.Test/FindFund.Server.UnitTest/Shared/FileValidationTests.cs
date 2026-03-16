@@ -89,5 +89,4 @@ public class FileValidationTests
         var rel = FileValidation.GetRelativePathFromUrl(url);
         rel.Should().Be(url);
     }
-
 }

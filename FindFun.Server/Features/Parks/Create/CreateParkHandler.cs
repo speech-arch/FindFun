@@ -10,20 +10,17 @@ namespace FindFun.Server.Features.Parks.Create;
 public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHandler> logger)
 {
     // this should return the image urls and the id of the created park 
-    public async Task<Result<int>> HandleAsync(CreateParkRequest request, FileUpLoad fileUpLoad, CancellationToken cancellationToken)
+    public async Task<Result<CreateParkResponse>> HandleAsync(CreateParkRequest request, FileUpLoad fileUpLoad, CancellationToken cancellationToken)
     {
         // use transaction
-        var entranceFee = ValidationHelper.ValidateEntrance(request.IsFree, request.EntranceFee);
-        if (!entranceFee.IsValid)
-            return Result<int>.Failure(entranceFee.ProblemDetails!);
 
         var coordinates = ValidationHelper.ParseCoordinate(request.Coordinates);
         if (!coordinates.IsValid)
-            return Result<int>.Failure(coordinates.ProblemDetails!);
+            return Result<CreateParkResponse>.Failure(coordinates.ProblemDetails!);
 
         var amenityGroup = ValidationHelper.ParseAmenityGroup(request.Amenities);
         if (!amenityGroup.IsValid)
-            return Result<int>.Failure(amenityGroup.ProblemDetails!);
+            return Result<CreateParkResponse>.Failure(amenityGroup.ProblemDetails!);
 
         var municipalityId = await dbContext.Municipalities.AsNoTracking()
             .Where(m => m.OfficialNa6 == request.Locality)
@@ -32,7 +29,7 @@ public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHan
 
         if (municipalityId == 0)
         {
-            return StatusCodes.Status400BadRequest.CreateProblemResult<CreateParkRequest, int>("Locality", "Locality not found.");
+            return StatusCodes.Status400BadRequest.CreateProblemResult<CreateParkRequest, CreateParkResponse>("Locality", "Locality not found.");
         }
 
         var existingAddress = await dbContext.Addresses
@@ -49,7 +46,7 @@ public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHan
                 .AnyAsync(p => p.AddressId == existingAddress.Id, cancellationToken);
 
             if (parkExists)
-                return StatusCodes.Status409Conflict.CreateProblemResult<CreateParkRequest, int>("Address", "The address already exists.");
+                return StatusCodes.Status409Conflict.CreateProblemResult<CreateParkRequest, CreateParkResponse>("Address", "The address already exists.");
         }
 
         Street? street = existingAddress?.Street;
@@ -102,7 +99,7 @@ public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHan
         if (uploaded.Any(r => !r.IsValid))
         {
             await FileValidation.DeleteUploadedFilesAsync(uploaded, fileUpLoad, cancellationToken);
-            return StatusCodes.Status400BadRequest.CreateProblemResult<CreateParkRequest, int>("ParkImages", "One or more images failed to upload.");
+            return StatusCodes.Status400BadRequest.CreateProblemResult<CreateParkRequest, CreateParkResponse>("ParkImages", "One or more images failed to upload.");
         }
 
         var images = uploaded.Select(r => new ParkImage(r.Data!)).ToList();
@@ -115,13 +112,13 @@ public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHan
         try
         {
             await dbContext.SaveChangesAsync(cancellationToken);
-            return Result<int>.Success(park.Id);
+            return Result<CreateParkResponse>.Success(new CreateParkResponse(park.Id, images.Select(i => i.Url).ToList()));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to create park '{ParkName}'", request.Name);
             await FileValidation.DeleteUploadedFilesAsync(uploaded, fileUpLoad, cancellationToken);
-            return StatusCodes.Status500InternalServerError.CreateProblemResult<CreateParkRequest, int>("Park", "Failed to create park.");
+            return StatusCodes.Status500InternalServerError.CreateProblemResult<CreateParkRequest, CreateParkResponse>("Park", "Failed to create park.");
         }
     }
 }
