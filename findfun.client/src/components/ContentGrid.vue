@@ -28,23 +28,19 @@ interface WindowWithScrollToMapMarker extends Window {
   scrollToMapMarker?: (parkId: string) => void
 }
 
-// Local UI state for sorting and filtering
-const sortKey = ref<any>(null)  // Changed to any to accept cascade objects
+const sortKey = ref<any>(null) 
 const sortOrder = ref<1 | -1>(1)
-const selectedFilters = ref<any>(null)  // Changed to any to accept cascade filter objects
+const selectedFilters = ref<any>(null)
 const layout = ref('grid')
 const options = ref([
   { icon: 'pi pi-th-large', value: 'grid' },
   { icon: 'pi pi-list', value: 'list' },
 ])
 
-// Date range filtering for events (array with [startDate, endDate])
-// Default to today's date
 const dateRange = ref<Array<Date | null>>([new Date()])
 const upcomingOnly = ref(false)
 const ongoingOnly = ref(false)
 
-// Use composable for API-based filtering, sorting and pagination
 const { page, nextPage: goToNextPage, prevPage: goToPrevPage } = useSearchFilter({
   isViewingEvents,
   searchTerm,
@@ -57,9 +53,7 @@ const { page, nextPage: goToNextPage, prevPage: goToPrevPage } = useSearchFilter
   pageSize: 6,
 })
 
-// Get filtered products from store (already filtered by API)
 const paginatedProducts = computed(() => isViewingEvents.value ? events.value : parks.value)
-
 const totalPagesRef = computed(() => isViewingEvents.value ? eventsTotalPages.value : totalPages.value)
 
 const nextPage = () => {
@@ -75,10 +69,8 @@ const onSortChange = (field: string) => {
 }
 
 const sortOptions = [
-  { label: 'Name', value: 'name' },
-  { label: 'Location', value: 'location' },
-  { label: 'Municipality', value: 'municipality' },
-  { label: 'Province', value: 'province' },
+  { label: 'Ascending', value: 'asc' },
+  { label: 'Descending', value: 'desc' }, 
 ]
 
 const scrollToMapMarker = (parkId: string) => {
@@ -100,14 +92,6 @@ const goToDetail = (parkId: string) => {
   router.push({ name: pagaToGo, params: { id: parkId } })
 }
 
-// Test category options for SectionHeader
-const testCategoryOptions = [
-  { label: 'Nature', value: 'nature' },
-  { label: 'History', value: 'history' },
-  { label: 'Family', value: 'family' },
-  { label: 'Adventure', value: 'adventure' },
-  { label: 'Relaxation', value: 'relaxation' },
-]
 </script>
 
 <template>
@@ -136,11 +120,13 @@ const testCategoryOptions = [
             :title="title"
             :sortKey="sortKey"
             :sortOptions="sortOptions"
+            :sortOrder="sortOrder"
             :layout="layout"
             :layoutOptions="options.map((o: any) => o.value?.toString() || '')"
             @update:sortKey="(val: any) => sortKey = val"
             @update:layout="(val: string) => layout = val"
             @sort-change="(val: any) => onSortChange(val)"
+            @update:sortOrder="(val: any) => sortOrder = val"
             @update:selectedCategories="(val: any) => selectedFilters = val?.[0] || null"
           />
         </div>

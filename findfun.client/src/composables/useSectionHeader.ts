@@ -1,3 +1,4 @@
+import type { CascadeSelectChangeEvent } from 'primevue';
 import { computed, ref, type Ref } from 'vue'
 
 export interface SectionHeaderOptions {
@@ -39,7 +40,7 @@ export function useSectionHeader(props: any, emit: any, options: SectionHeaderOp
       get: () => props.selectedCategories ?? [],
       set: (val: string[]) => emit('update:selectedCategories', val),
     })
-  const onSortChange = options.onSortChange || ((event: any) => emit('sort-change', event))
+  const onSortChange = options.onSortChange || ((event: CascadeSelectChangeEvent) => emit('sort-change', event))
 
   const windowWidth = ref(window.innerWidth)
 

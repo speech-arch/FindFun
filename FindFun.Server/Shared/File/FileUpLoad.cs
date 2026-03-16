@@ -14,7 +14,7 @@ public class FileUpLoad(BlobServiceClient blobServiceClient, IOptions<Connection
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var containerName = _connectionStrings.Value?.Blobs;
+        var containerName = _connectionStrings.Value?.ContainerName;
         if (string.IsNullOrWhiteSpace(containerName))
             throw new InvalidOperationException("Configuration key 'ConnectionStrings:Blobs' not found.");
 
@@ -35,7 +35,7 @@ public class FileUpLoad(BlobServiceClient blobServiceClient, IOptions<Connection
 
     public async Task<Result<bool>> DeleteFileAsync(string relativePath, CancellationToken cancellationToken = default)
     {
-        var containerName = _connectionStrings.Value?.Blobs;
+        var containerName = _connectionStrings.Value?.ContainerName;
         if (string.IsNullOrWhiteSpace(containerName))
             throw new InvalidOperationException("Configuration key 'ConnectionStrings:Blobs' not found.");
 

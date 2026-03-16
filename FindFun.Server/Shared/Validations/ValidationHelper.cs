@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.ComponentModel.DataAnnotations;
 
-namespace FindFun.Server.Shared;
+namespace FindFun.Server.Shared.Validations;
 
 public static class ValidationHelper
 {
@@ -48,7 +48,7 @@ public static class ValidationHelper
 
     public static Result<(string, string?)> ParseAmenityGroup(string amenities)
     {
-        // here the code should be imporoved to ensure the error case works as expected
+        // here the code should be imporoved to ensure the error case works as expected and return validationResult so the this can be called in dto validation 
         if (string.IsNullOrWhiteSpace(amenities))
         {
             return Result<(string, string?)>.Failure(new ValidationProblemDetails
@@ -61,23 +61,17 @@ public static class ValidationHelper
         var note = parts.Length > 1 ? parts[1] : null;
         return Result<(string, string?)>.Success((parts[0], note));
     }
-    public static Result<decimal> ValidateEntrance(bool isFree, decimal entranceFee)
+    public static ValidationResult EntranceValidation(bool isFree, decimal entranceFee)
     {
-        if (isFree)
-            return Result<decimal>.Success(0m);
-
-        if (entranceFee <= 0m)
+        if (isFree && entranceFee != 0m)
         {
-            return Result<decimal>.Failure(new ValidationProblemDetails
-            {
-                Errors = new Dictionary<string, string[]>
-                {
-                    { "EntranceFee", ["Entrance fee must be greater than 0." ]}
-                }
-            });
+            return new ValidationResult("Entrance fee must be 0 when the park is free.", ["EntranceFee"]);
         }
-
-        return Result<decimal>.Success(entranceFee);
+        if (!isFree && entranceFee <= 0m)
+        {
+            return new ValidationResult("Entrance fee must be greater than 0.", ["EntranceFee"]);
+        }
+        return ValidationResult.Success!;
     }
 }
 

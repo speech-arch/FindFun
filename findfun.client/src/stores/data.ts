@@ -7,7 +7,7 @@ import { RoutePaths } from '@/config/Enums'
 
 export interface GetParksParams {
   search?: string
-  sortBy?: 'name' | 'location' | 'municipality' | 'province'
+  sortBy?: 'name' | 'location' | 'municipality' | 'province' | 'rating' | 'parkType' | 'distance'
   sortDirection?: 'asc' | 'desc'
   page?: number
   pageSize?: number
@@ -17,6 +17,9 @@ export interface GetParksParams {
   latitude?: number
   longitude?: number
   radiusKm?: number
+  rating?: number
+  amenities?: string
+  parkType?: string
 }
 
 export interface PagedParksResponse {
@@ -72,7 +75,6 @@ export const useParksStore = defineStore('parks', () => {
     isLoading.value = true
     cancelSource.value.cancel()
     cancelSource.value = client.createCancelToken()
-    console.log('Fetching parks with params:', queryParams)
     const params = queryParams || {
       page: 1,
       pageSize: 10,
@@ -86,9 +88,8 @@ export const useParksStore = defineStore('parks', () => {
     ) {
       params.latitude = userLocation.value.coords.latitude
       params.longitude = userLocation.value.coords.longitude
-      params.radiusKm = params.radiusKm ?? 2000
+      params.radiusKm = params.radiusKm ?? 20
     }
-    console.log('Fetching parks with params:', params)
 
     const [data, error] = await safeRequest(() =>
       client.get<PagedParksResponse>(
@@ -164,7 +165,7 @@ export const useParksStore = defineStore('parks', () => {
           pageSize: 10,
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
-          radiusKm: 2000,
+          radiusKm: 20,
         })
       }
     },

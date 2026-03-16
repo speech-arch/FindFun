@@ -52,6 +52,12 @@ public class ParkConfiguration : IEntityTypeConfiguration<Park>
 
         builder.HasOne(x => x.ClosingSchedule)
             .WithOne(x => x.Park)
-            .HasForeignKey<ClosingSchedule>(x => x.ParkId);
+            .HasForeignKey<ClosingSchedule>(x => x.ParkId)
+            .OnDelete(DeleteBehavior.ClientCascade);
+
+        builder.HasMany(x => x.Amenities)
+            .WithOne(x => x.Park)
+            .HasForeignKey(x => x.ParkId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

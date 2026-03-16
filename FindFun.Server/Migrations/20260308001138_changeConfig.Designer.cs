@@ -2,6 +2,7 @@
 using FindFun.Server.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FindFun.Server.Migrations
 {
     [DbContext(typeof(FindFunDbContext))]
-    partial class FindFunDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260308001138_changeConfig")]
+    partial class changeConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -346,7 +349,7 @@ namespace FindFun.Server.Migrations
                     b.HasOne("FindFun.Server.Domain.Park", "Park")
                         .WithOne("ClosingSchedule")
                         .HasForeignKey("FindFun.Server.Domain.ClosingSchedule", "ParkId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.OwnsMany("FindFun.Server.Domain.ClosingScheduleEntry", "Entries", b1 =>

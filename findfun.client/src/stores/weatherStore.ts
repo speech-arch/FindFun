@@ -24,7 +24,7 @@ const airQualityLevelMap: Record<string, { color: string; icon: string }> = {
  * @param {number|null} value - The value to map
  * @returns {{ name: string, level: string, color: string, icon: string }}
  */
-export function mapAirQualityDisplay(type: string, value: number | null)
+export function mapAirQualityDisplay(type: string, value: number | null): { name: string; level: string; color: string; icon: string }
 {
   let level = ''
   switch (type)

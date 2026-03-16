@@ -22,10 +22,8 @@ public class Park
 
     public ClosingSchedule? ClosingSchedule { get; private set; }
 
-    private readonly List<ParkAmenity> _amenities = [];
-    public IReadOnlyCollection<ParkAmenity> Amenities => _amenities;
-    private readonly List<ParkImage> _images = [];
-    public IReadOnlyCollection<ParkImage> Images => _images;
+    public ICollection<ParkAmenity> Amenities { get; private set; } = [];
+    public ICollection<ParkImage> Images { get; private set; } = [];
 
     protected Park()
     {
@@ -59,22 +57,25 @@ public class Park
     public void AddAmenity(Amenity amenity)
     {
         var pa = new ParkAmenity { Park = this, Amenity = amenity };
-        _amenities.Add(pa);
+        Amenities.Add(pa);
     }
 
     public void ClearAmenities()
     {
-        _amenities.Clear();
+        Amenities.Clear();
     }
 
     public void AddImages(IEnumerable<ParkImage> images)
     {
         if (images is null) return;
-        _images.AddRange(images);
+        foreach (var image in images)
+        {
+            Images.Add(image);
+        }
     }
 
     public void ClearImages()
     {
-        _images.Clear();
+        Images.Clear();
     }
 }

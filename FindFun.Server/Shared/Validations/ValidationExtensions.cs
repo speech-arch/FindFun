@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
 using System.ComponentModel.DataAnnotations;
 
@@ -23,7 +22,6 @@ public static class ProblemDetailsResultExtensions
 
     private static Result<T> BuildValidationProblemResult<T>(bool includeAllErrors, List<ValidationResult> results)
     {
-        // maybe the use of the ModelStateDictionary is not the best option because we can add the errors directly to the ValidationProblemDetails,
         var errorsToProcess = includeAllErrors ? results : results.Take(1);
 
         var errors = errorsToProcess
