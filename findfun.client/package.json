@@ -50,7 +50,7 @@
     "postcss-import": "^16.1.1",
     "prettier": "3.5.3",
     "sharp": "^0.34.5",
-    "svgo": "^4.0.0",
+    "svgo": "^4.0.1",
     "tailwindcss": "^4.1.10",
     "tailwindcss-primeui": "^0.6.1",
     "typescript": "~5.8.0",
