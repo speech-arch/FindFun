@@ -4,6 +4,7 @@ using FindFun.Server.Features.Parks.Get;
 using FindFun.Server.Infrastructure;
 using FindFun.Server.Shared.File;
 using FindFun.Server.Shared.Middleware;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,6 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddOpenApi()
     .AddEndpointsApiExplorer()
-    .AddSwaggerGen()
     .AddValidation()
     .AddProblemDetails().
     AddExceptionHandler<GlobalExceptionHandler>();
@@ -40,8 +40,7 @@ app.MapStaticAssets();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
