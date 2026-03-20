@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, type Ref } from 'vue'
+import { ref } from 'vue'
 import { useGeolocation } from '../composables/useGeolocation'
 
 interface IPLocationData
@@ -23,15 +23,25 @@ interface LocationError
   code?: number
 }
 
+interface LocationMetadata
+{
+  city: string | null
+  region: string | null
+  country: string | null
+  ip: string | null
+}
+
 export const useUserLocationStore = defineStore('userLocation', () =>
 {
   const userLocation = ref<GeolocationPosition | null>(null)
   const locationError = ref<string | null>(null)
   const isLocationLoading = ref(false)
-  const city: Ref<string | null> = ref(null)
-  const region: Ref<string | null> = ref(null)
-  const country: Ref<string | null> = ref(null)
-  const ip = ref<string | null>(null)
+  const locationMetadata = ref<LocationMetadata>({
+    city: null,
+    region: null,
+    country: null,
+    ip: null,
+  })
 
   const setLocationState = (position: GeolocationPosition): void =>
   {
@@ -82,10 +92,12 @@ export const useUserLocationStore = defineStore('userLocation', () =>
           timestamp: Date.now(),
           toJSON: () => ({}),
         }
-        city.value = data.city
-        region.value = data.region
-        country.value = data.country_name
-        ip.value = data.ip
+        locationMetadata.value = {
+          city: data.city,
+          region: data.region,
+          country: data.country_name,
+          ip: data.ip,
+        }
         isLocationLoading.value = false
       },
       (err: LocationError) =>
@@ -100,20 +112,19 @@ export const useUserLocationStore = defineStore('userLocation', () =>
     userLocation.value = null
     locationError.value = null
     isLocationLoading.value = false
-    city.value = null
-    region.value = null
-    country.value = null
-    ip.value = null
+    locationMetadata.value = {
+      city: null,
+      region: null,
+      country: null,
+      ip: null,
+    }
   }
 
   return {
     userLocation,
     locationError,
     isLocationLoading,
-    city,
-    region,
-    country,
-    ip,
+    locationMetadata,
     setLocationState,
     setLocationError,
     fetchUserLocationWithWatch,
