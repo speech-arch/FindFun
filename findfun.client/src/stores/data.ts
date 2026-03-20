@@ -1,11 +1,12 @@
-import { storeToRefs } from 'pinia'
-import { watch } from 'vue'
+import { storeToRefs, defineStore } from 'pinia'
+import { ref, watch } from 'vue'
 import { useUserLocationStore } from './userLocation'
 import { HttpClient, safeRequest } from '@/composables/useHttpClient'
 import type { Events, Park } from '@/types/park'
 import { RoutePaths } from '@/config/Enums'
 
-export interface GetParksParams {
+export interface GetParksParams
+{
   search?: string
   sortBy?: 'name' | 'location' | 'municipality' | 'province' | 'rating' | 'parkType' | 'distance'
   sortDirection?: 'asc' | 'desc'
@@ -22,7 +23,8 @@ export interface GetParksParams {
   parkType?: string
 }
 
-export interface PagedParksResponse {
+export interface PagedParksResponse
+{
   items: Park[]
   totalCount: number
   page: number
@@ -30,7 +32,8 @@ export interface PagedParksResponse {
   totalPages: number
 }
 
-export interface GetEventsParams {
+export interface GetEventsParams
+{
   search?: string
   sortBy?: 'title' | 'starttime' | 'endtime' | 'location'
   sortDirection?: 'asc' | 'desc'
@@ -46,7 +49,8 @@ export interface GetEventsParams {
   ongoingOnly?: boolean
 }
 
-export interface PagedEventsResponse {
+export interface PagedEventsResponse
+{
   items: Events[]
   totalCount: number
   page: number
@@ -54,7 +58,8 @@ export interface PagedEventsResponse {
   totalPages: number
 }
 
-export const useParksStore = defineStore('parks', () => {
+export const useParksStore = defineStore('parks', () =>
+{
   const client = new HttpClient({
     baseURL: RoutePaths.BaseURL,
   })
@@ -71,7 +76,8 @@ export const useParksStore = defineStore('parks', () => {
   const userLocationStore = useUserLocationStore()
   const { userLocation } = storeToRefs(userLocationStore)
 
-  async function fetchParks(queryParams?: GetParksParams) {
+  async function fetchParks(queryParams?: GetParksParams)
+  {
     isLoading.value = true
     cancelSource.value.cancel()
     cancelSource.value = client.createCancelToken()
@@ -85,7 +91,8 @@ export const useParksStore = defineStore('parks', () => {
       !params.latitude &&
       !params.longitude &&
       typeof userLocation.value?.coords?.latitude === 'number'
-    ) {
+    )
+    {
       params.latitude = userLocation.value.coords.latitude
       params.longitude = userLocation.value.coords.longitude
       params.radiusKm = params.radiusKm ?? 20
@@ -99,7 +106,8 @@ export const useParksStore = defineStore('parks', () => {
       ),
     )
 
-    if (error?.canceled || error) {
+    if (error?.canceled || error)
+    {
       isLoading.value = false
       return
     }
@@ -109,7 +117,8 @@ export const useParksStore = defineStore('parks', () => {
     isLoading.value = false
   }
 
-  async function fetchEvents(queryParams?: GetEventsParams) {
+  async function fetchEvents(queryParams?: GetEventsParams)
+  {
     isLoading.value = true
     cancelSource.value.cancel()
     cancelSource.value = client.createCancelToken()
@@ -127,7 +136,8 @@ export const useParksStore = defineStore('parks', () => {
       ),
     )
 
-    if (error?.canceled || error) {
+    if (error?.canceled || error)
+    {
       isLoading.value = false
       return
     }
@@ -137,29 +147,35 @@ export const useParksStore = defineStore('parks', () => {
     isLoading.value = false
   }
 
-  async function fetchParkById(id: string) {
+  async function fetchParkById(id: string)
+  {
     const exists = parks.value.some((p) => p.id === id)
     if (exists) return
 
     const [data, error] = await safeRequest(() => client.get<Park>(`${RoutePaths.Parks}/${id}`))
-    if (!error && data) {
+    if (!error && data)
+    {
       parks.value.push(data)
     }
   }
-  async function fetchEventById(id: string) {
+  async function fetchEventById(id: string)
+  {
     const exists = events.value.some((e) => e.id === id)
     if (exists) return
 
     const [data, error] = await safeRequest(() => client.get<Events>(`${RoutePaths.Events}/${id}`))
 
-    if (!error && data) {
+    if (!error && data)
+    {
       events.value.push(data)
     }
   }
   watch(
     userLocation,
-    (loc) => {
-      if (loc?.coords?.latitude && loc?.coords?.longitude) {
+    (loc) =>
+    {
+      if (loc?.coords?.latitude && loc?.coords?.longitude)
+      {
         fetchParks({
           page: 1,
           pageSize: 10,

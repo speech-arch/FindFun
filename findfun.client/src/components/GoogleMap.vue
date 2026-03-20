@@ -36,7 +36,7 @@ import { getDistanceKm, setUserMarkerAndCenter } from '../composables/useMapUtil
 import { useMapWindowEvents } from '../composables/useMapWindowEvents'
 import Card from 'primevue/card'
 
-interface MarkerWithId extends google.maps.Marker {
+interface MarkerWithId extends google.maps.marker.AdvancedMarkerElement {
   id?: string | number
 }
 
@@ -50,10 +50,11 @@ const userLocationStore = useUserLocationStore()
 const { userLocation } = storeToRefs(userLocationStore)
 const lat = ref<number>(0)
 const lng = ref<number>(0)
-const apiKey = 'AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg' // Dev/Test only!
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
+const mapError = ref<string | null>(null)
 
-const userMarker = ref<google.maps.Marker | null>(null)
-const locationMarkers = ref<google.maps.Marker[]>([])
+const userMarker = ref<google.maps.marker.AdvancedMarkerElement | null>(null)
+const locationMarkers = ref<google.maps.marker.AdvancedMarkerElement[]>([])
 
 watch(
   () => props.data,
@@ -102,7 +103,7 @@ const loadGoogleMapsApi = async () => {
   if (!window.google || !window.google.maps) {
     await new Promise((resolve, reject) => {
       const script = document.createElement('script')
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=maps&v=beta`
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker&v=2024.12`
       script.async = true
       script.onload = () => resolve(null)
       script.onerror = () => reject(new Error('Google Maps failed to load'))
@@ -135,23 +136,23 @@ function scrollToProduct(productIdOrIndex: string | number) {
 
 function addLocationMarkersWithClick(
   map: google.maps.Map | null,
-  markersRef: { value: google.maps.Marker[] },
+  markersRef: { value: google.maps.marker.AdvancedMarkerElement[] },
   locations: Location[],
   onMarkerClick: (id: string | number) => void,
 ) {
   if (!window.google || !window.google.maps) return
   if (Array.isArray(markersRef?.value)) {
-    markersRef.value.forEach((m) => m.setMap(null))
+    markersRef.value.forEach((m) => m.map = null)
   }
   markersRef.value = []
   locations.forEach((loc) => {
-    const marker = new window.google.maps.Marker({
+    const marker = new window.google.maps.marker.AdvancedMarkerElement({
       position: { lat: loc.latitude, lng: loc.longitude },
       map: map || undefined,
       title: loc.title || loc.name || 'Nearby Location',
     }) as MarkerWithId
     marker.id = loc.id
-    marker.addListener('click', () => {
+    marker.addEventListener('click', () => {
       onMarkerClick('product-card-' + loc.id)
     })
     markersRef.value.push(marker)
