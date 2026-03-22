@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using FindFun.Server.Shared.Pagination;
 
 namespace FindFun.Server.Features.Parks.Get;

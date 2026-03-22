@@ -1,4 +1,5 @@
-﻿using FindFun.Server.Shared;
+﻿using System.Net.Http.Headers;
+using FindFun.Server.Shared;
 using FindFun.Server.Shared.File;
 using Microsoft.AspNetCore.Http;
 
@@ -81,6 +82,20 @@ public static class WebApplicationTestData
                 ExpectedErrorKey: null,
                 ExpectedErrorMessage: null)
         };
+    }
+    public static async Task<HttpResponseMessage> PostAsync(RequestCaseData requestCase, WebAplicationCustomFactory factory, HttpClient httpClient)
+    {
+        await factory.AddMunicipality();
+        var multipart = WebApplicationTestData.CreateBaseMultipart(factory.MunicipalityName, requestCase);
+        AddFiles(requestCase.FormFieldName!, requestCase.FileName!, requestCase.FileBytes!, requestCase.ContentType!, multipart);
+        var response = await httpClient.PostAsync("/api/parks", multipart);
+        return response;
+    }
+    public static void AddFiles(string formFieldName, string fileName, byte[] fileBytes, string contentType, MultipartFormDataContent multipart)
+    {
+        var byteContent = new ByteArrayContent(fileBytes);
+        byteContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+        multipart.Add(byteContent, formFieldName, fileName);
     }
     public static async Task<List<Result<string>>> UpLoadFile(FileUpLoad fileUpLoad)
     {

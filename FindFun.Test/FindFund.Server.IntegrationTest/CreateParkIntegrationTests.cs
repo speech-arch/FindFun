@@ -3,9 +3,7 @@ using FindFun.Server.Shared.Validations;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace FindFund.Server.IntegrationTest;
 
@@ -63,7 +61,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
     public async Task CreatePark_ShouldReturnBadRequest_WhenLocalityNotFound(RequestCaseData testCase)
     {
         var multipart = WebApplicationTestData.CreateBaseMultipart("NonExistentLocality", testCase);
-        AddFiles(testCase.FormFieldName!, testCase.FileName!, testCase.FileBytes!, testCase.ContentType!, multipart);
+        WebApplicationTestData.AddFiles(testCase.FormFieldName!, testCase.FileName!, testCase.FileBytes!, testCase.ContentType!, multipart);
 
         var response = await _httpClient.PostAsync("/api/parks", multipart);
 
@@ -81,7 +79,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
     [MemberData(nameof(WebApplicationTestData.ValidFileData), MemberType = typeof(WebApplicationTestData))]
     public async Task CreatePark_ShouldCreates_WhenValidDataProvided_ReturnsId(RequestCaseData requestCaseData)
     {
-        HttpResponseMessage response = await PostAsync(requestCaseData);
+        HttpResponseMessage response = await WebApplicationTestData.PostAsync(requestCaseData, _factory, _httpClient);
         // Assert
         response.EnsureSuccessStatusCode();
         var createParkresponse = await response.Content.ReadFromJsonAsync<CreateParkResponse>();
@@ -106,7 +104,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
             ExpectedErrorMessage: null);
 
         var multipart = WebApplicationTestData.CreateBaseMultipart(_factory.MunicipalityName, requestCaseData);
-        AddFiles("ParkImages", "image.png", [0x89, 0x50, 0x4E, 0x47], "image/png", multipart);
+        WebApplicationTestData.AddFiles("ParkImages", "image.png", [0x89, 0x50, 0x4E, 0x47], "image/png", multipart);
         var response = await _httpClient.PostAsync("/api/parks", multipart);
 
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
@@ -124,7 +122,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
 
         var multipart = WebApplicationTestData.CreateBaseMultipart(_factory.MunicipalityName, testCase);
 
-        AddFiles(testCase.FormFieldName!, testCase.FileName!, testCase.FileBytes!, testCase.ContentType!, multipart);
+       WebApplicationTestData.AddFiles(testCase.FormFieldName!, testCase.FileName!, testCase.FileBytes!, testCase.ContentType!, multipart);
 
         var response = await _httpClient.PostAsync("/api/parks", multipart);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -146,7 +144,7 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
         var requestWithSchedule = requestCaseData with { ClosingSchedule = "Mon:09-17" };
 
         // Act
-        var response = await PostAsync(requestWithSchedule);
+        var response = await WebApplicationTestData.PostAsync(requestWithSchedule, _factory, _httpClient);
 
         response.EnsureSuccessStatusCode();
         var createParkResponse = await response.Content.ReadFromJsonAsync<CreateParkResponse>();
@@ -163,21 +161,4 @@ public class CreateParkIntegrationTests : IClassFixture<WebAplicationCustomFacto
         park.Amenities.First().Amenity.Should().NotBeNull();
         park.Amenities.First().Amenity!.Name.Should().Be(ValidationHelper.ParseAmenityGroup(requestWithSchedule.AmenityGroup).Data.Item1);
     }
-
-    private async Task<HttpResponseMessage> PostAsync(RequestCaseData requestCase)
-    {
-        await _factory.AddMunicipality();
-        var multipart = WebApplicationTestData.CreateBaseMultipart(_factory.MunicipalityName, requestCase);
-        AddFiles(requestCase.FormFieldName!, requestCase.FileName!, requestCase.FileBytes!, requestCase.ContentType!, multipart);
-        var response = await _httpClient.PostAsync("/api/parks", multipart);
-        return response;
-    }
-
-    private static void AddFiles(string formFieldName, string fileName, byte[] fileBytes, string contentType, MultipartFormDataContent multipart)
-    {
-        var byteContent = new ByteArrayContent(fileBytes);
-        byteContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-        multipart.Add(byteContent, formFieldName, fileName);
-    }
-
 }

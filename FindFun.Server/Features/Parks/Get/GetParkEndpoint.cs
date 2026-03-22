@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-
 namespace FindFun.Server.Features.Parks.Get;
 
 public static class GetParkEndpoint
