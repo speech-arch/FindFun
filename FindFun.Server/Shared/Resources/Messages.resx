@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="InvalidCoordinateFormat" xml:space="preserve">
+    <value>Invalid coordinate format.</value>
+  </data>
+  <data name="AmenitiesCannotBeEmpty" xml:space="preserve">
+    <value>Amenities cannot be empty.</value>
+  </data>
+  <data name="EntranceFeeMustBeZeroWhenFree" xml:space="preserve">
+    <value>Entrance fee must be 0 when the park is free.</value>
+  </data>
+  <data name="EntranceFeeGreaterThanZero" xml:space="preserve">
+    <value>Entrance fee must be greater than 0.</value>
+  </data>
+  <data name="ValidationErrorsOccurred" xml:space="preserve">
+    <value>One or more validation errors occurred.</value>
+  </data>
+  <data name="ParkNotFound" xml:space="preserve">
+    <value>Park not found.</value>
+  </data>
+  <data name="LocalityNotFound" xml:space="preserve">
+    <value>Locality not found.</value>
+  </data>
+  <data name="AddressAlreadyExists" xml:space="preserve">
+    <value>The address already exists.</value>
+  </data>
+  <data name="OneOrMoreImagesFailedToUpload" xml:space="preserve">
+    <value>One or more images failed to upload.</value>
+  </data>
+  <data name="FailedToCreatePark" xml:space="preserve">
+    <value>Failed to create park.</value>
+  </data>
+  <data name="ConnectionStringBlobsNotFound" xml:space="preserve">
+    <value>Configuration key 'ConnectionStrings:Blobs' not found.</value>
+  </data>
+  <data name="UnhandledExceptionOccurred" xml:space="preserve">
+    <value>An unhandled exception occurred while processing the request.</value>
+  </data>
+  <data name="FieldCoordinates" xml:space="preserve">
+    <value>Coordinates</value>
+  </data>
+  <data name="FieldAmenities" xml:space="preserve">
+    <value>Amenities</value>
+  </data>
+  <data name="FieldEntranceFee" xml:space="preserve">
+    <value>EntranceFee</value>
+  </data>
+  <data name="FieldLocality" xml:space="preserve">
+    <value>Locality</value>
+  </data>
+  <data name="FieldAddress" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="FieldParkImages" xml:space="preserve">
+    <value>ParkImages</value>
+  </data>
+  <data name="FieldPark" xml:space="preserve">
+    <value>Park</value>
+  </data>
+  <data name="FieldParkId" xml:space="preserve">
+    <value>ParkId</value>
+  </data>
+</root>

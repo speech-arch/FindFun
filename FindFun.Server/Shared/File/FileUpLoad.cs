@@ -1,6 +1,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using FindFun.Server.Infrastructure.Options;
+using FindFun.Server.Shared.Resources;
 using Microsoft.Extensions.Options;
 
 namespace FindFun.Server.Shared.File;
@@ -16,7 +17,7 @@ public class FileUpLoad(BlobServiceClient blobServiceClient, IOptions<Connection
 
         var containerName = _connectionStrings.Value?.ContainerName;
         if (string.IsNullOrWhiteSpace(containerName))
-            throw new InvalidOperationException("Configuration key 'ConnectionStrings:Blobs' not found.");
+            throw new InvalidOperationException(Messages.ConnectionStringBlobsNotFound);
 
         var container = _blobServiceClient.GetBlobContainerClient(containerName);
         await container.CreateIfNotExistsAsync(publicAccessType: PublicAccessType.Blob, cancellationToken: cancellationToken);
@@ -37,7 +38,7 @@ public class FileUpLoad(BlobServiceClient blobServiceClient, IOptions<Connection
     {
         var containerName = _connectionStrings.Value?.ContainerName;
         if (string.IsNullOrWhiteSpace(containerName))
-            throw new InvalidOperationException("Configuration key 'ConnectionStrings:Blobs' not found.");
+            throw new InvalidOperationException(FindFun.Server.Shared.Resources.Messages.ConnectionStringBlobsNotFound);
 
         var container = _blobServiceClient.GetBlobContainerClient(containerName);
         var blobName = relativePath.TrimStart('/');

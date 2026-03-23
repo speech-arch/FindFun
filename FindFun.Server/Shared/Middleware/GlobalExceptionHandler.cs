@@ -1,4 +1,5 @@
-﻿using FindFun.Server.Shared.Validations;
+﻿using FindFun.Server.Shared.Resources;
+using FindFun.Server.Shared.Validations;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
@@ -13,7 +14,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IWeb
 
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "An unhandled exception occurred while processing the request.");
+        _logger.LogError(exception, Messages.UnhandledExceptionOccurred);
         var problem = CreateProblemDetails(exception);
 
         await Results.Problem(problem).ExecuteAsync(httpContext);

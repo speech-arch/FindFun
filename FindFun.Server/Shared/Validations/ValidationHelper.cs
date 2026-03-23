@@ -2,6 +2,7 @@ using FindFun.Server.Domain;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.ComponentModel.DataAnnotations;
+using FindFun.Server.Shared.Resources;
 
 namespace FindFun.Server.Shared.Validations;
 
@@ -19,7 +20,7 @@ public static class ValidationHelper
 
         return Result<CoordinateDto>.Failure(new ValidationProblemDetails
         {
-            Errors = new Dictionary<string, string[]> { { "Coordinates", ["Invalid coordinate format."] } }
+            Errors = new Dictionary<string, string[]> { { Messages.FieldCoordinates, [Messages.InvalidCoordinateFormat] } }
         });
     }
 
@@ -53,7 +54,7 @@ public static class ValidationHelper
         {
             return Result<(string, string?)>.Failure(new ValidationProblemDetails
             {
-                Errors = new Dictionary<string, string[]> { { "Amenities", ["Amenities cannot be empty."] } }
+                Errors = new Dictionary<string, string[]> { { Messages.FieldAmenities, [Messages.AmenitiesCannotBeEmpty] } }
             });
         }
 
@@ -65,11 +66,11 @@ public static class ValidationHelper
     {
         if (isFree && entranceFee != 0m)
         {
-            return new ValidationResult("Entrance fee must be 0 when the park is free.", ["EntranceFee"]);
+            return new ValidationResult(Messages.EntranceFeeMustBeZeroWhenFree, [Messages.FieldEntranceFee]);
         }
         if (!isFree && entranceFee <= 0m)
         {
-            return new ValidationResult("Entrance fee must be greater than 0.", ["EntranceFee"]);
+            return new ValidationResult(Messages.EntranceFeeGreaterThanZero, [Messages.FieldEntranceFee]);
         }
         return ValidationResult.Success!;
     }

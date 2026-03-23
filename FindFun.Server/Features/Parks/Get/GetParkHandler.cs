@@ -1,5 +1,6 @@
 using FindFun.Server.Infrastructure;
 using FindFun.Server.Shared;
+using FindFun.Server.Shared.Resources;
 using FindFun.Server.Shared.Validations;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,9 +19,9 @@ public class GetParkHandler(FindFunDbContext dbContext)
             p.Description ?? string.Empty,
             p.AddressId.ToString(),
             p.Address.Line,
-            p.Address.Coordinates.Y,
+            p.Address.Coordinates!.Y,
             p.Address.Coordinates.X,
-            p.Address.Street.Municipio.OfficialNa6,
+            p.Address.Street!.Municipio!.OfficialNa6,
             p.Address.Street.Municipio.OfficialNa4,
             p.Address.Street.Municipio.OfficialNa,
             Array.Empty<GetParkReviewResponse>(),
@@ -35,8 +36,8 @@ public class GetParkHandler(FindFunDbContext dbContext)
         if (response is null)
         {
             return StatusCodes.Status404NotFound.CreateProblemResult<GetParkRequest, GetParkResponse>(
-                "ParkId",
-                "Park not found."
+                Messages.FieldParkId,
+                Messages.ParkNotFound
             );
         }
         return Result<GetParkResponse>.Success(response);

@@ -2,6 +2,7 @@
 using FindFun.Server.Infrastructure;
 using FindFun.Server.Shared;
 using FindFun.Server.Shared.File;
+using FindFun.Server.Shared.Resources;
 using FindFun.Server.Shared.Validations;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +30,7 @@ public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHan
 
         if (municipalityId == 0)
         {
-            return StatusCodes.Status400BadRequest.CreateProblemResult<CreateParkRequest, CreateParkResponse>("Locality", "Locality not found.");
+            return StatusCodes.Status400BadRequest.CreateProblemResult<CreateParkRequest, CreateParkResponse>(Messages.FieldLocality, Messages.LocalityNotFound);
         }
 
         var existingAddress = await dbContext.Addresses
@@ -46,7 +47,7 @@ public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHan
                 .AnyAsync(p => p.AddressId == existingAddress.Id, cancellationToken);
 
             if (parkExists)
-                return StatusCodes.Status409Conflict.CreateProblemResult<CreateParkRequest, CreateParkResponse>("Address", "The address already exists.");
+                return StatusCodes.Status409Conflict.CreateProblemResult<CreateParkRequest, CreateParkResponse>(Messages.FieldAddress, Messages.AddressAlreadyExists);
         }
 
         Street? street = existingAddress?.Street;
@@ -99,7 +100,7 @@ public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHan
         if (uploaded.Any(r => !r.IsValid))
         {
             await FileValidation.DeleteUploadedFilesAsync(uploaded, fileUpLoad, cancellationToken);
-            return StatusCodes.Status400BadRequest.CreateProblemResult<CreateParkRequest, CreateParkResponse>("ParkImages", "One or more images failed to upload.");
+            return StatusCodes.Status400BadRequest.CreateProblemResult<CreateParkRequest, CreateParkResponse>(Messages.FieldParkImages, Messages.OneOrMoreImagesFailedToUpload);
         }
 
         var images = uploaded.Select(r => new ParkImage(r.Data!)).ToList();
@@ -118,7 +119,7 @@ public class CreateParkHandler(FindFunDbContext dbContext, ILogger<CreateParkHan
         {
             logger.LogError(ex, "Failed to create park '{ParkName}'", request.Name);
             await FileValidation.DeleteUploadedFilesAsync(uploaded, fileUpLoad, cancellationToken);
-            return StatusCodes.Status500InternalServerError.CreateProblemResult<CreateParkRequest, CreateParkResponse>("Park", "Failed to create park.");
+            return StatusCodes.Status500InternalServerError.CreateProblemResult<CreateParkRequest, CreateParkResponse>(Messages.FieldPark, Messages.FailedToCreatePark);
         }
     }
 }

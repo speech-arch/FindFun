@@ -32,7 +32,7 @@ public static class ProblemDetailsResultExtensions
 
         var problemDetails = new ValidationProblemDetails(errors)
         {
-            Title = "One or more validation errors occurred.",
+            Title = FindFun.Server.Shared.Resources.Messages.ValidationErrorsOccurred,
             Status = StatusCodes.Status400BadRequest,
             Type = ProblemDetailsConstants.BadRequest,
         };
