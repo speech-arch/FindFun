@@ -1,8 +1,4 @@
-﻿
-
-using static System.Net.Mime.MediaTypeNames;
-
-namespace FindFun.Server.Domain;
+﻿namespace FindFun.Server.Domain;
 
 public class Review
 {
@@ -11,17 +7,19 @@ public class Review
     public int Rating { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public Guid UserId { get; set; }
+    public string UserName { get; private set; } = null!;
     public int ParkId { get; set; }
     public Park Park { get; set; } = null!;
     public Guid? EventId { get; set; }
 
     protected Review() { }
 
-    public Review(string content, int rating)
+    public Review(string content, int rating, string userName)
     {
         Content = content;
         Rating = rating;
         CreatedAt = DateTime.UtcNow;
+        UserName = userName;
     }
 
     public void UpdateDetails(string content, int rating)

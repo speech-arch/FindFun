@@ -59,5 +59,10 @@ public class ParkConfiguration : IEntityTypeConfiguration<Park>
             .WithOne(x => x.Park)
             .HasForeignKey(x => x.ParkId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.Reviews)
+            .WithOne(x => x.Park)
+            .HasForeignKey(x => x.ParkId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

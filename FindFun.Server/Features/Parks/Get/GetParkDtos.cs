@@ -12,6 +12,8 @@ public sealed record GetParkReviewResponse(
     string CreatedAt
 );
 
+// CreateReviewRequest moved to Reviews feature
+
 public sealed record GetParkResponse(
     string Id,
     string Name,

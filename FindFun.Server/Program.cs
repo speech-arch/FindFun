@@ -1,6 +1,8 @@
+using FindFun.Server.Features;
 using FindFun.Server.Features.Parks;
 using FindFun.Server.Features.Parks.Create;
 using FindFun.Server.Features.Parks.Get;
+using FindFun.Server.Features.Reviews.Create;
 using FindFun.Server.Infrastructure;
 using FindFun.Server.Shared.File;
 using FindFun.Server.Shared.Middleware;
@@ -12,6 +14,7 @@ builder.Services.AddScoped<FileUpLoad>()
     .AddScoped<CreateParkHandler>()
     .AddScoped<GetParkHandler>()
     .AddScoped<GetParksHandler>();
+builder.Services.AddScoped<CreateReviewHandler>();
 
 builder.Services.AddSingleton<GlobalExceptionHandler>();
 builder.AddServiceDefaults()
@@ -44,7 +47,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapParks();
+app.MapEndpoints();
 app.MapFallbackToFile("/index.html");
 await app.InitializeDbAsync();
 

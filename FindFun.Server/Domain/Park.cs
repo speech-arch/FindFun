@@ -24,6 +24,7 @@ public class Park
 
     public ICollection<ParkAmenity> Amenities { get; private set; } = [];
     public ICollection<ParkImage> Images { get; private set; } = [];
+    public ICollection<Review> Reviews { get; private set; } = [];
 
     protected Park()
     {

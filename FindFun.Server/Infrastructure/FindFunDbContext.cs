@@ -13,6 +13,7 @@ public class FindFunDbContext(DbContextOptions<FindFunDbContext> options) : DbCo
     public DbSet<Municipality> Municipalities => Set<Municipality>();
     public DbSet<ClosingSchedule> ClosingSchedules => Set<ClosingSchedule>();
     public DbSet<ParkImage> ParkImages => Set<ParkImage>();
+    public DbSet<Review> Reviews => Set<Review>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
