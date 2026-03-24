@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-black dark:text-white">
+  <div :class="[{ 'my-app-dark': isDark }, 'min-h-screen bg-white dark:bg-black dark:text-white']">
     <a
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:bg-white focus:text-blue-600 focus:px-3 focus:py-2 focus:rounded"
@@ -75,6 +75,19 @@ function skipToContent() {
 onMounted(() => {
   window.addEventListener('resize', updateIsMobile)
   userLocationStore.fetchUserLocationFromIP()
+  // Initialize dark-mode selector for PrimeVue theme
+  const stored = localStorage.getItem('color-mode')
+  const prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')
+  isDark.value = stored === 'dark' || (stored === null && prefers && prefers.matches)
+  if (prefers && prefers.addEventListener) {
+    const handler = (e: MediaQueryListEvent) => {
+      // only change when no explicit user preference
+      if (!localStorage.getItem('color-mode')) {
+        isDark.value = e.matches
+      }
+    }
+    prefers.addEventListener('change', handler)
+  }
 })
 
 onUnmounted(() => {

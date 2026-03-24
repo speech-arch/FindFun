@@ -49,8 +49,7 @@ const handlePlacesClick = () => {
           <RouterLink
             v-if="!nav.special"
             :to="nav.to!"
-            class="flex flex-col items-center justify-center min-w-0 px-3"
-            style="text-decoration: none"
+            class="flex flex-col items-center justify-center min-w-0 px-3 no-underline"
             active-class="text-blue-600"
           >
             <i

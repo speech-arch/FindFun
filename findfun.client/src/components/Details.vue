@@ -53,11 +53,8 @@
           class="flex flex-col justify-between gap-6 min-w-[260px] min-h-[260px] md:px-6 lg:px-8"
         >
           <div class="md:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold mb-2" style="margin-bottom: 1rem">{{ parkInfo.name }}</h1>
-            <div
-              class="flex flex-col gap-2 text-gray-700 dark:text-gray-200"
-              style="margin-top: 1rem"
-            >
+            <h1 class="text-3xl font-bold mb-4">{{ parkInfo.name }}</h1>
+            <div class="flex flex-col gap-2 text-gray-700 dark:text-gray-200 mt-4">
               <!-- Amenities Section -->
               <div v-if="visibleAmenities.length" class="flex flex-wrap gap-2 mt-2">
                 <span
@@ -234,7 +231,7 @@
           </TabPanel>
         </TabView>
         <!-- Related Parks -->
-        <div class="relative z-10" style="margin-top: 2rem">
+        <div class="relative z-10 mt-8">
           <div class="mt-16">
             <RelatedList
               :items="relatedParks || []"
@@ -251,7 +248,7 @@
           </div>
         </div>
       </div>
-      <div class="mb-6" style="margin-top: 1rem">
+      <div class="mb-6 mt-4">
         <Button label="Back" icon="pi pi-arrow-left" outlined class="mb-4" @click="goBack" />
       </div>
     </template>

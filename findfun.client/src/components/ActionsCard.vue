@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="flex justify-between items-center mt-2 text-xs text-black-600" v-if="showReviews">
-      <span class="flex items-center gap-1" style="margin-right: 0.5rem">
+      <span class="flex items-center gap-1 mr-2">
         <span
           v-if="mainAirMetric"
           class="flex items-center gap-1 px-2 py-1 rounded w-fit text-[10px]"

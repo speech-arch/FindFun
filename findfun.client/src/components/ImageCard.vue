@@ -9,7 +9,7 @@
       decoding="async"
       @click="$emit('go-to-detail')"
     />
-    <div class="absolute bg-black/70 rounded-border" style="left: 4px; top: 4px">
+    <div class="absolute bg-black/70 rounded-border left-1 top-1">
       <StatusTag :status="statusText" :tag-style="tagStyle" />
     </div>
     <slot />
