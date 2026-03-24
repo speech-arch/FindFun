@@ -58,6 +58,12 @@ export interface PagedEventsResponse
   totalPages: number
 }
 
+export interface CreateParkApiResponse
+{
+  parkId: number
+  imageUrls: string[]
+}
+
 export const useParksStore = defineStore('parks', () =>
 {
   const client = new HttpClient({
@@ -170,6 +176,14 @@ export const useParksStore = defineStore('parks', () =>
       events.value.push(data)
     }
   }
+
+  async function createPark(formData: globalThis.FormData)
+  {
+    const [data, error] = await safeRequest(() =>
+      client.upload<CreateParkApiResponse>(RoutePaths.Parks, formData),
+    )
+    return { data, error }
+  }
   watch(
     userLocation,
     (loc) =>
@@ -200,5 +214,6 @@ export const useParksStore = defineStore('parks', () =>
     fetchEvents,
     fetchParkById,
     fetchEventById,
+    createPark,
   }
 })

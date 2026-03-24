@@ -3,6 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config'
+import ToastService from 'primevue/toastservice'
 import Aura from '@primeuix/themes/aura'
 import 'primeicons/primeicons.css'
 import { Icon } from '@iconify/vue'
@@ -22,6 +23,7 @@ app.use(PrimeVue, {
     },
   },
 })
+app.use(ToastService)
 
 // Register global components
 // eslint-disable-next-line vue/multi-word-component-names

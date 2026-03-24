@@ -98,7 +98,7 @@ const goToDetail = (parkId: string) => {
     }"
   />
   <div
-    class="card border-surface-200 dark:border-surface-700 rounded-xl m-2 mt-0 p-4 shadow-md transform scale-100 transition-transform duration-300"
+    class="card border-surface-200 dark:border-surface-700 !rounded-none m-2 mt-0 p-4 shadow-md transform scale-100 transition-transform duration-300"
   >
     <DataView
       :value="paginatedProducts"

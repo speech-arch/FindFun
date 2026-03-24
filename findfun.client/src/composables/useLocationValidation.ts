@@ -1,6 +1,8 @@
 import { ref } from 'vue'
+import { useToast } from 'primevue/usetoast'
 
 export function useLocationValidation(form: any) {
+  const toast = useToast()
   const placeDetails = ref({
     placeId: '',
     lat: null,
@@ -34,27 +36,37 @@ export function useLocationValidation(form: any) {
     }
   }
 
-  function waitForGoogleMaps(): Promise<void> {
-    let timeoutId: ReturnType<typeof setTimeout> | null = null
-    const cleanup = () => {
-      if (timeoutId) clearTimeout(timeoutId)
-    }
-    const promise: Promise<void> = new Promise((resolve) => {
-      const check = () => {
-        if ((window as any).google?.maps?.Geocoder) resolve(undefined)
-        else timeoutId = setTimeout(check, 100)
+  function waitForGoogleMaps(timeoutMs = 2_000): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if ((window as any).google?.maps?.Geocoder) {
+        resolve()
+        return
       }
-      check()
+      const deadline = setTimeout(() => {
+        clearInterval(poll)
+        reject(new Error('Google Maps did not load in time'))
+      }, timeoutMs)
+      const poll = setInterval(() => {
+        if ((window as any).google?.maps?.Geocoder) {
+          clearInterval(poll)
+          clearTimeout(deadline)
+          resolve()
+        }
+      }, 100)
     })
-    ;(promise as any).cleanup = cleanup
-    return promise
   }
 
   async function validateLocation(): Promise<boolean> {
     const input = form.value.location.trim()
     if (!input) return false
 
-    await waitForGoogleMaps()
+    try {
+      await waitForGoogleMaps()
+    } catch {
+      toast.add({ severity: 'error', summary: 'Map unavailable', detail: 'Could not load map services for location validation. Please check your connection and try again.', life: 5000 })
+      return false
+    }
+
     const geocoder = new (window as any).google.maps.Geocoder()
 
     return new Promise((resolve) => {
@@ -76,7 +88,7 @@ export function useLocationValidation(form: any) {
           form.value.location = result.formatted_address || ''
           resolve(true)
         } else {
-          alert('Invalid location. Please enter a valid place.')
+          toast.add({ severity: 'warn', summary: 'Invalid location', detail: 'Please enter a valid place and select it from the suggestions.', life: 5000 })
           resolve(false)
         }
       })

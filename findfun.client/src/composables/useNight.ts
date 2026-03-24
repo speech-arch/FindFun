@@ -1,5 +1,3 @@
-// src/composables/useNight.ts
-
 /**
  * Determines if the current time is considered night based on sunrise and sunset.
  * @param currentTime - The current time as an ISO string.

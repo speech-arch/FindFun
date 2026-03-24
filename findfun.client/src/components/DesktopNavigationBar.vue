@@ -27,7 +27,7 @@ const filteredItems = computed(() => {
   <header v-if="!isMobile">
     <!-- Desktop Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-50 w-full">
-      <Menubar :model="filteredItems" class="card items-center hidden sm:flex w-full">
+      <Menubar :model="filteredItems" class="card items-center hidden sm:flex w-full !rounded-none">
         <template #start>
           <Logo />
         </template>
@@ -76,7 +76,7 @@ const filteredItems = computed(() => {
         </template>
         <template #end>
           <NavBarUserSection
-            avatar-class="w-10 h-10 rounded-full object-cover aspect-square ml-4"
+            avatar-class="w-10 h-10 rounded-full object-cover aspect-square ml-4 !rounded-none"
             color-mode-class=""
             search-class="w-full"
           />

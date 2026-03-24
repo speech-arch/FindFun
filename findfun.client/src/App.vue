@@ -1,11 +1,18 @@
 <template>
-  <div :class="[{ 'my-app-dark': isDark }, 'min-h-screen bg-white dark:bg-black dark:text-white']">
+  <div :class="['min-h-screen', isDark ? 'bg-black text-white' : 'bg-white text-black']">
     <a
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:bg-white focus:text-blue-600 focus:px-3 focus:py-2 focus:rounded"
       @click.prevent="skipToContent"
       >Skip to main content</a
     >
+    <Toast
+      :position="toastPosition"
+      :pt="{
+        root: 'w-[calc(100vw-2rem)] sm:w-96 max-w-[calc(100vw-2rem)]',
+        message: 'shadow-lg',
+      }"
+    />
     <DesktopNavigationBar />
     <MobileNavigationBar />
     <main
@@ -15,7 +22,7 @@
       <RouterView />
     </main>
     <footer
-      class="w-full py-4 px-6 bg-white dark:bg-black border-t border-surface-200 dark:border-surface-700 text-center text-sm text-gray-500 dark:text-gray-400 hidden sm:block sticky bottom-0 left-0"
+      class="w-full py-4 px-6 bg-black dark:bg-black border-t border-surface-200 dark:border-surface-700 text-center text-sm text-gray-500 dark:text-gray-400 hidden sm:block sticky bottom-0 left-0"
     >
       © {{ new Date().getFullYear() }} Swings & Slides Parks App. All rights reserved.
     </footer>
@@ -23,7 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, provide } from 'vue'
+import { onMounted, onUnmounted, ref, watch, provide, computed } from 'vue'
+import Toast from 'primevue/toast'
 import { useUserLocationStore } from './stores/userLocation'
 import { useServiceWorker } from './composables/useServiceWorker'
 
@@ -32,35 +40,26 @@ const userLocationStore = useUserLocationStore()
 // Initialize service worker (PWA support)
 useServiceWorker()
 
+const isMobile = ref(window.innerWidth < 640)
+const toastPosition = computed(() => (isMobile.value ? 'top-center' : 'top-right'))
+
 const items = ref([
-  {
-    label: 'Home',
-    icon: 'pi pi-home',
-  },
-  {
-    label: 'Parks',
-    icon: 'pi pi-image',
-  },
-  {
-    label: 'Events',
-    icon: 'pi pi-calendar',
-  },
-  {
-    label: 'places',
-    icon: 'pi pi-map-marker',
-  },
-  {
-    label: 'Create',
-    icon: 'pi pi-plus',
-  },
-  {
-    label: 'About',
-    icon: 'pi pi-info-circle',
-  },
+  { label: 'Home', icon: 'pi pi-home' },
+  { label: 'Parks', icon: 'pi pi-image' },
+  { label: 'Events', icon: 'pi pi-calendar' },
+  { label: 'places', icon: 'pi pi-map-marker' },
+  { label: 'Create', icon: 'pi pi-plus' },
+  { label: 'About', icon: 'pi pi-info-circle' },
 ])
 
-const isMobile = ref(window.innerWidth < 640)
-const isDark = ref(false)
+const stored = localStorage.getItem('color-mode')
+const isDark = ref(stored === 'dark' || (stored === null && window.matchMedia('(prefers-color-scheme: dark)').matches))
+
+watch(isDark, (dark) => {
+  document.documentElement.classList.toggle('my-app-dark', dark)
+  document.documentElement.classList.toggle('dark', dark)
+  localStorage.setItem('color-mode', dark ? 'dark' : 'light')
+}, { immediate: true })
 
 function updateIsMobile() {
   isMobile.value = window.innerWidth < 640
@@ -76,19 +75,12 @@ function skipToContent() {
 onMounted(() => {
   window.addEventListener('resize', updateIsMobile)
   userLocationStore.fetchUserLocationFromIP()
-  // Initialize dark-mode selector for PrimeVue theme
-  const stored = localStorage.getItem('color-mode')
-  const prefers = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')
-  isDark.value = stored === 'dark' || (stored === null && prefers && prefers.matches)
-  if (prefers && prefers.addEventListener) {
-    const handler = (e: MediaQueryListEvent) => {
-      // only change when no explicit user preference
-      if (!localStorage.getItem('color-mode')) {
-        isDark.value = e.matches
-      }
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (localStorage.getItem('color-mode') === null) {
+      isDark.value = e.matches
     }
-    prefers.addEventListener('change', handler)
-  }
+  })
 })
 
 onUnmounted(() => {
@@ -97,4 +89,5 @@ onUnmounted(() => {
 
 provide('items', items)
 provide('isMobile', isMobile)
+provide('isDark', isDark)
 </script>

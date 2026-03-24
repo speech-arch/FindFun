@@ -1,11 +1,11 @@
 <template>
   <Card
-    class="card border-surface-200 dark:border-surface-700 m-2 mt-0 p-4 shadow-md transform scale-100 transition-transform duration-300"
+    class="card border-0 m-2 mt-0 p-4 shadow-md transform scale-100 transition-transform duration-300 !rounded-none"
   >
     <template #title>Location</template>
     <template #content>
       <div class="relative w-full h-[450px] shadow">
-        <section ref="map" class="w-full h-full rounded" aria-label="Park map"></section>
+        <section ref="map" class="w-full h-full" aria-label="Park map"></section>
         <div
           v-if="userLocationStore.isLocationLoading"
           class="absolute inset-0 flex items-center justify-center bg-black opacity-20"

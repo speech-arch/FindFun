@@ -44,7 +44,7 @@ watch(activeTabIndex, (idx) => {
 </script>
 
 <template>
-  <section class="flex flex-col">
+  <section class="flex flex-col w-full min-h-screen gap-6">
     <MainCarousel :products="mapData" :responsiveOptions="responsiveOptions" :key="mapKey"/>
     <TabView
       :activeIndex="activeTabIndex"
@@ -55,6 +55,8 @@ watch(activeTabIndex, (idx) => {
         <ContentGrid :viewMoreRoute="tab.route" :title="tab.type" hasViewMore />
       </TabPanel>
     </TabView>
-    <GoogleMap :data="mapData" :filteredProducts="mapData" :key="mapKey" />
+    <div class="flex-1 w-full min-h-[450px]">
+      <GoogleMap :data="mapData" :filteredProducts="mapData" :key="mapKey" />
+    </div>
   </section>
 </template>

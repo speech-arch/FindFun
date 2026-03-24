@@ -1,7 +1,7 @@
 import ContentGrid from '@/components/ContentGrid.vue'
 import ClosingSchedule from '@/components/ClosingSchedule.vue'
 import { RoutePaths, ViewType } from './Enums'
-import { Calendar, Dropdown, FileUpload, InputText, SelectButton, Textarea } from 'primevue'
+import { Calendar, Dropdown, FileUpload, InputNumber, InputText, SelectButton, Textarea } from 'primevue'
 import type { Component } from 'vue'
 import AmenitiesSelector from '@/components/AmenitiesSelector.vue'
 
@@ -109,7 +109,20 @@ export const fieldRegistry: Record<string, FormField> = {
     label: 'Organizer',
     placeholder: 'Organizer',
     props: { required: true },
-    types: ['event'],
+    types: ['park', 'event'],
+  },
+  entranceFee: {
+    model: 'entranceFee',
+    component: InputNumber,
+    label: 'Entrance Fee',
+    props: {
+      mode: 'currency',
+      currency: 'EUR',
+      locale: 'en-US',
+      minFractionDigits: 2,
+      min: 0,
+    },
+    types: ['park', 'event'],
   },
   closingSchedule: {
     model: 'closingSchedule',
@@ -117,7 +130,7 @@ export const fieldRegistry: Record<string, FormField> = {
     types: ['park', 'event'],
   },
   ageRecommendation: {
-    model: 'Age Recommendation',
+    model: 'ageRecommendation',
     component: Dropdown,
     label: 'Age Recommendation',
     props: {
@@ -132,7 +145,7 @@ export const fieldRegistry: Record<string, FormField> = {
       optionValue: 'value',
       required: true,
     },
-    types: ['event'],
+    types: ['park', 'event'],
   },
   date: {
     model: 'date',
