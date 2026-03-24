@@ -191,7 +191,6 @@
               label="Create"
               icon="pi pi-plus"
               outlined
-              @click="goToCreate"
             />
           </div>
         </div>
