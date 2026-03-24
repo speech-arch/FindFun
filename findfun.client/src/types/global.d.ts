@@ -17,7 +17,6 @@ declare global
   interface Window
   {
     google: typeof google
-    _markerInfoWindow?: google.maps.InfoWindow | undefined
     scrollToMapMarker?: (id: string) => void
   }
 }
