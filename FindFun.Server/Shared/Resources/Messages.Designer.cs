@@ -31,6 +31,7 @@ namespace FindFun.Server.Shared.Resources
         internal static string FieldParkImages => ResourceManager.GetString("FieldParkImages", CultureInfo.CurrentUICulture) ?? string.Empty;
         internal static string FieldPark => ResourceManager.GetString("FieldPark", CultureInfo.CurrentUICulture) ?? string.Empty;
         internal static string FieldParkId => ResourceManager.GetString("FieldParkId", CultureInfo.CurrentUICulture) ?? string.Empty;
+        internal static string FieldId => ResourceManager.GetString("FieldId", CultureInfo.CurrentUICulture) ?? string.Empty;
     }
 }
 

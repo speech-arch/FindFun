@@ -29,16 +29,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, shallowRef, onUnmounted } from 'vue'
 import type { Location } from '../types/park'
 import { useUserLocationStore } from '../stores/userLocation'
 import { getDistanceKm, setUserMarkerAndCenter } from '../composables/useMapUtils'
 import { useMapWindowEvents } from '../composables/useMapWindowEvents'
 import Card from 'primevue/card'
 
-interface MarkerWithId extends google.maps.marker.AdvancedMarkerElement {
-  id?: string | number
-}
+type MarkerWithId = google.maps.marker.AdvancedMarkerElement & { parkId?: string | number }
 
 const props = defineProps<{
   data?: Location[]
@@ -51,10 +49,9 @@ const { userLocation } = storeToRefs(userLocationStore)
 const lat = ref<number>(0)
 const lng = ref<number>(0)
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
-const mapError = ref<string | null>(null)
 
-const userMarker = ref<google.maps.marker.AdvancedMarkerElement | null>(null)
-const locationMarkers = ref<google.maps.marker.AdvancedMarkerElement[]>([])
+const userMarker = shallowRef<google.maps.marker.AdvancedMarkerElement | null>(null)
+const locationMarkers = shallowRef<MarkerWithId[]>([])
 
 watch(
   () => props.data,
@@ -82,7 +79,8 @@ const filteredLocations = computed(() => {
   )
 })
 
-const gmap = ref<google.maps.Map | null>(null)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const gmap = shallowRef<any>(null)
 
 function refreshMarkers() {
   if (!gmap.value) return
@@ -103,7 +101,7 @@ const loadGoogleMapsApi = async () => {
   if (!window.google || !window.google.maps) {
     await new Promise((resolve, reject) => {
       const script = document.createElement('script')
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker&v=2024.12`
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=marker&v=weekly`
       script.async = true
       script.onload = () => resolve(null)
       script.onerror = () => reject(new Error('Google Maps failed to load'))
@@ -118,6 +116,7 @@ const createMapInstance = () => {
   const mapInstance = new GoogleMap(map.value, {
     center: DEFAULT_CENTER,
     zoom: 6,
+    mapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || 'DEMO_MAP_ID',
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: false,
@@ -135,24 +134,22 @@ function scrollToProduct(productIdOrIndex: string | number) {
 }
 
 function addLocationMarkersWithClick(
-  map: google.maps.Map | null,
-  markersRef: { value: google.maps.marker.AdvancedMarkerElement[] },
+  mapInstance: google.maps.Map | null,
+  markersRef: { value: MarkerWithId[] },
   locations: Location[],
   onMarkerClick: (id: string | number) => void,
 ) {
   if (!window.google || !window.google.maps) return
-  if (Array.isArray(markersRef?.value)) {
-    markersRef.value.forEach((m) => m.map = null)
-  }
+  markersRef.value.forEach((m) => { m.map = null })
   markersRef.value = []
   locations.forEach((loc) => {
     const marker = new window.google.maps.marker.AdvancedMarkerElement({
       position: { lat: loc.latitude, lng: loc.longitude },
-      map: map || undefined,
+      map: mapInstance ?? undefined,
       title: loc.title || loc.name || 'Nearby Location',
     }) as MarkerWithId
-    marker.id = loc.id
-    marker.addEventListener('click', () => {
+    marker.parkId = loc.id
+    marker.addListener('gmp-click', () => {
       onMarkerClick('product-card-' + loc.id)
     })
     markersRef.value.push(marker)
@@ -178,18 +175,6 @@ watch(
   { deep: true, immediate: false },
 )
 
-useMapWindowEvents({
-  map,
-  gmap,
-  locationMarkers,
-  filteredLocations: props.data || [],
-})
-
-declare global {
-  interface Window {
-    google: typeof google
-    scrollToMapMarker?: (productId: string) => void
-    _markerInfoWindow?: google.maps.InfoWindow
-  }
-}
+const { cleanup } = useMapWindowEvents(map, gmap, locationMarkers)
+onUnmounted(cleanup)
 </script>

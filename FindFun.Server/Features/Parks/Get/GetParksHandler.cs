@@ -61,7 +61,7 @@ public class GetParksHandler(FindFunDbContext dbContext)
                 p.Address.Street!.Municipio!.OfficialNa6,
                 p.Address.Street.Municipio.OfficialNa4,
                 p.Address.Street.Municipio.OfficialNa,
-                Array.Empty<GetParkReviewResponse>(),
+                p.Reviews.Select(r => new GetParkReviewResponse(r.Id.ToString(), r.UserId.ToString(), r.Content, r.Rating, r.CreatedAt.ToString("o"))).ToList(),
                 p.Amenities.Select(a => a.Amenity.Name).ToList(),
                 p.ParkType!,
                 p.Images.Select(i => i.Url).ToList(),

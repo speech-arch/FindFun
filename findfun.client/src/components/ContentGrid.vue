@@ -24,9 +24,6 @@ const parksStore = useParksStore()
 const isViewingEvents = computed(() => props.title === ViewType.Event)
 const { parks, events, totalPages, eventsTotalPages } = storeToRefs(parksStore)
 
-interface WindowWithScrollToMapMarker extends Window {
-  scrollToMapMarker?: (parkId: string) => void
-}
 
 const sortKey = ref<any>(null) 
 const sortOrder = ref<1 | -1>(1)
@@ -74,14 +71,7 @@ const sortOptions = [
 ]
 
 const scrollToMapMarker = (parkId: string) => {
-  const mapDiv = document.querySelector('[ref=map]') || document.getElementById('map')
-  if (mapDiv) mapDiv.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  setTimeout(() => {
-    const win = window as WindowWithScrollToMapMarker
-    if (win.scrollToMapMarker) {
-      win.scrollToMapMarker(parkId)
-    }
-  }, 800)
+  window.scrollToMapMarker?.(String(parkId))
 }
 
 const { save } = useBackNavigationRestore('lastProductId')
