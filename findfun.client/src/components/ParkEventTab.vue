@@ -34,7 +34,7 @@ const length = computed(() => (isPark.value ? parks.value.length : events.value.
     <div class="p-8">
       <div v-if="isLoading" class="card flex justify-center">
         <ProgressSpinner
-          style="width: 50px; height: 50px"
+          class="w-12 h-12"
           strokeWidth="8"
           fill="transparent"
           animationDuration=".5s"

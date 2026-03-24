@@ -60,6 +60,7 @@ const items = ref([
 ])
 
 const isMobile = ref(window.innerWidth < 640)
+const isDark = ref(false)
 
 function updateIsMobile() {
   isMobile.value = window.innerWidth < 640
