@@ -75,7 +75,7 @@ function showMenu(event: Event) {
       shape="circle"
       :class="avatarClass ?? 'w-10 h-10 rounded-full object-cover aspect-square ml-4'"
       @click="showMenu"
-      style="cursor: pointer"
+      class="cursor-pointer"
     />
     <Menu ref="menu" :model="menuItems" :popup="true" class="w-40" />
   </div>

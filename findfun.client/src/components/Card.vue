@@ -17,8 +17,7 @@
         @go-to-detail="$emit('go-to-detail', item.id)"
       />
       <div
-        class="absolute left-0 bottom-0 bg-black/60 text-white p-3 z-10"
-        style="max-width: 300px; max-height: 300px; width: 100%; height: auto"
+        class="absolute left-0 bottom-0 bg-black/60 text-white p-3 z-10 max-w-[300px] max-h-[300px] w-full h-auto"
       >
         <div
           ref="nameRef"
