@@ -7,25 +7,14 @@ import { Routes } from '@/config/Enums'
 const route = useRoute()
 const parksStore = useParksStore()
 
-const parkId = computed(() => {
-  const id = route.params.id as string
-  const name = route.name as string
-  return [id, name]
-})
+const id = computed(() => (route.params.id as string) || '')
+const name = computed(() => (route.name as string) || '')
+const isPark = computed(() => name.value === Routes.ParkDetail)
 
-const [id, name] = parkId.value
-const isPark = name == Routes.ParkDetail
-
-// onMounted(async () => {
-//   if (isPark) {
-//     await parksStore.fetchParkById(id);
-//   } else {
-//     await parksStore.fetchEventById(id);
-//   }
-// });
 watch(
-  [() => id, () => isPark],
+  [id, isPark],
   async ([newId, newIsPark]) => {
+    if (!newId) return
     if (newIsPark) {
       await parksStore.fetchParkById(newId)
     } else {
@@ -34,12 +23,12 @@ watch(
   },
   { immediate: true },
 )
-// have to meake sure no property missing when it event
+
 const park = computed<Park>(() => {
-  const found = isPark
-    ? parksStore.parks.find((p: Park) => p.id === id)
-    : parksStore.events.find((p: Events) => p.id === id)
-  return found ?? ({} as Park)
+  const found = isPark.value
+    ? parksStore.parks.find((p: Park) => p.id === id.value)
+    : parksStore.events.find((p: Events) => p.id === id.value)
+  return (found as Park) ?? ({} as Park)
 })
 
 const images = ref([])
@@ -50,7 +39,6 @@ const relatedParks = ref([])
   <EventParkDetails
     :parkInfo="park"
     :images="images"
-    :reviews="park.reviews"
     :relatedParks="relatedParks"
     :isPark="isPark"
   />

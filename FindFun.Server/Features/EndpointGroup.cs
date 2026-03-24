@@ -7,7 +7,7 @@ public static class EndpointGroup
 {
         public static void MapEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapParks()
-            .MapReviews();
-    }
+            app.MapParks();
+            app.MapReviews();
+        }
 }

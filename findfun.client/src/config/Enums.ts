@@ -18,7 +18,7 @@ export enum RoutePaths {
   ParkDetail = '/parks/:id',
   Login = '/login',
   Signup = '/signup',
-  CreatePark = '/create-park',
+  CreatePark = '/create',
   BaseURL = '/api',
   InitialData = '/initial-data',
 }

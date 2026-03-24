@@ -83,7 +83,7 @@ const handlePlacesClick = () => {
           <button
             v-else-if="nav.special === 'create'"
             class="flex flex-col items-center justify-center min-w-0 px-3 opacity-100 cursor-pointer focus:outline-none"
-            @click="router.push('/create-park')"
+            @click="router.push('/create')"
             :aria-label="'Create park or event'"
           >
             <i :class="[nav.icon, 'text-2xl mb-1 text-black dark:text-white']" />

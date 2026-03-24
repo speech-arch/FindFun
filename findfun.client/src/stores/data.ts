@@ -64,6 +64,17 @@ export interface CreateParkApiResponse
   imageUrls: string[]
 }
 
+export interface CreateReviewRequest {
+  userName: string
+  content: string
+  rating: number
+  Id?: string
+}
+
+export interface CreateReviewResponse {
+  reviewId: string
+}
+
 export const useParksStore = defineStore('parks', () =>
 {
   const client = new HttpClient({
@@ -184,6 +195,33 @@ export const useParksStore = defineStore('parks', () =>
     )
     return { data, error }
   }
+  
+  async function createReview(parkId: string, payload: CreateReviewRequest) {
+    const body = {
+      userName: payload.userName,
+      content: payload.content,
+      rating: payload.rating,
+      Id: payload.Id ?? parkId,
+    }
+
+    const [data, error] = await safeRequest(() =>
+      client.post<CreateReviewResponse>(`/reviews/${parkId}`, body),
+    )
+    return { data, error }
+  }
+
+  async function refreshParkById(id: string) {
+    const [data, error] = await safeRequest(() => client.get<Park>(`${RoutePaths.Parks}/${id}`))
+    if (!error && data) {
+      const idx = parks.value.findIndex((p) => p.id === id)
+      if (idx >= 0) {
+        parks.value[idx] = data
+      } else {
+        parks.value.push(data)
+      }
+    }
+    return { data, error }
+  }
   watch(
     userLocation,
     (loc) =>
@@ -215,5 +253,7 @@ export const useParksStore = defineStore('parks', () =>
     fetchParkById,
     fetchEventById,
     createPark,
+    createReview,
+    refreshParkById,
   }
 })

@@ -166,7 +166,7 @@
               <div class="flex items-center gap-2">
                 <span class="text-gray-500 dark:text-gray-300 flex items-center gap-1">
                   <i class="pi pi-comments" />
-                  <span>{{ reviews.length }} reviews</span>
+                  <span>{{ displayedReviews.length }} reviews</span>
                 </span>
                 <UserRateing :rating="parkRating" star-size="h-5 w-5" />
                 <span class="text-xs text-gray-400 dark:text-gray-500"
@@ -187,6 +187,12 @@
               icon="pi pi-calendar"
               @click="$emit('plan-visit', parkInfo)"
             />
+            <Button
+              label="Create"
+              icon="pi pi-plus"
+              outlined
+              @click="goToCreate"
+            />
           </div>
         </div>
       </div>
@@ -197,11 +203,11 @@
           </TabPanel>
           <TabPanel header="Reviews" :value="'reviews'">
             <div
-              v-if="reviews && reviews.length"
+              v-if="displayedReviews && displayedReviews.length"
               class="w-full bg-white dark:bg-gray-900 rounded-t-xl shadow-md divide-y divide-gray-200 dark:divide-gray-700"
             >
               <div
-                v-for="review in reviews"
+                v-for="review in displayedReviews"
                 :key="review.id"
                 class="flex gap-4 py-6 px-4 first:pt-4 last:pb-2"
               >
@@ -224,7 +230,7 @@
             </div>
             <div v-else class="text-gray-400 dark:text-gray-500 text-sm">No reviews yet.</div>
             <hr class="border-t border-gray-200 dark:border-gray-700 my-4" />
-            <ReviewForm @submit="{}" />
+            <ReviewForm @submit="onReviewFormSubmit" />
           </TabPanel>
           <TabPanel header="Map" :value="'map'">
             <GoogleMap :data="[parkInfo]" :filteredProducts="[parkInfo]" :is-details="true" />
@@ -263,11 +269,13 @@ import { Icon } from '@iconify/vue'
 import { useParkWeatherAirQuality } from '@/composables/useParkWeatherAirQuality'
 import type { Park, ParkImage, Review, ParkRelated } from '@/types/park'
 import { matchAmenities } from '../composables/AmenitiesIcon'
+import { useParksStore } from '@/stores/data'
+import { useToast } from 'primevue/usetoast'
+import { ref } from 'vue'
 
 const props = defineProps<{
   parkInfo: Park
   images: ParkImage[]
-  reviews: Review[]
   relatedParks?: ParkRelated[]
 }>()
 
@@ -313,6 +321,55 @@ const imageClick = (index: number) => {
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+const parksStore = useParksStore()
+const toast = useToast()
+
+const displayedReviews = ref<Review[]>(props.parkInfo?.reviews ? [...props.parkInfo.reviews] : [])
+
+// Keep displayedReviews in sync with the canonical parkInfo.reviews
+watch(
+  () => props.parkInfo?.reviews,
+  (r) => {
+    displayedReviews.value = r ? [...r] : []
+  },
+  { immediate: true },
+)
+
+async function onReviewFormSubmit(payload: { author: string; rating: number; comment: string; date?: string }) {
+  const body = {
+    userName: payload.author,
+    content: payload.comment,
+    rating: payload.rating,
+    Id: props.parkInfo.id,
+  }
+
+  const res = await parksStore.createReview(props.parkInfo.id, body)
+  if (res.error) {
+
+    type ProblemDetails = { errors?: Record<string, string[]> }
+    const orig = (res.error as unknown as { original?: { response?: { data?: ProblemDetails } } }).original
+    const srvData = orig?.response?.data as ProblemDetails | undefined
+    const idErrors = srvData?.errors?.Id
+    if (idErrors && Array.isArray(idErrors)) {
+      toast.add({
+        severity: 'warn',
+        summary: 'Validation',
+        detail: `${idErrors.join('; ')} `,
+      })
+      return
+    }
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to submit review' })
+    return
+  }
+
+  await parksStore.refreshParkById(props.parkInfo.id)
+  const updatedPark = parksStore.parks.find((p: Park) => p.id === props.parkInfo.id)
+  if (updatedPark && Array.isArray(updatedPark.reviews)) {
+    displayedReviews.value = [...updatedPark.reviews]
+  }
+  toast.add({ severity: 'success', summary: 'Review added', detail: 'Thanks for your feedback' })
 }
 </script>
 <style scoped>

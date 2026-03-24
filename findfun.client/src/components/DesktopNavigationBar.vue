@@ -37,10 +37,9 @@ const filteredItems = computed(() => {
               !item.items &&
               typeof item.label === 'string' &&
               item.label.toLowerCase() !== 'places' &&
-              item.label.toLowerCase() !== 'create' &&
               item.label.toLowerCase() !== 'about'
             "
-            :to="{ name: (item.label || '').toLowerCase() }"
+            :to="{ name: typeof item.label === 'string' && item.label.toLowerCase() === 'create' ? 'create-park' : (item.label || '').toLowerCase() }"
             class="items-center hidden sm:flex px-2 py-1 rounded transition-colors hover:bg-blue-100 dark:hover:bg-blue-900 no-underline"
             active-class="bg-blue-600 text-white"
           >

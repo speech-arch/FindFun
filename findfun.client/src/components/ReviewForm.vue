@@ -27,18 +27,6 @@
           class="rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
-      <!-- <div class="flex flex-col gap-1">
-        <label for="street" class="text-sm text-gray-700 dark:text-gray-200">Street</label>
-        <input v-model="street" id="street" type="text" maxlength="64"
-          class="rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      </div>
-      <div class="flex flex-col gap-1">
-        <label for="postal" class="text-sm text-gray-700 dark:text-gray-200">Postal Code</label>
-        <input v-model="postalCode" id="postal" type="text" maxlength="16"
-          class="rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-        <span v-if="postalError" class="text-red-500 text-xs mt-1">{{ postalError }}</span>
-        <span v-if="postalResult" class="text-green-600 text-xs mt-1">Found: {{ postalResult }}</span>
-      </div> -->
       <button
         type="submit"
         class="self-start bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded shadow disabled:opacity-50 disabled:cursor-not-allowed"
