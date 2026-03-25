@@ -187,11 +187,6 @@
               icon="pi pi-calendar"
               @click="$emit('plan-visit', parkInfo)"
             />
-            <Button
-              label="Create"
-              icon="pi pi-plus"
-              outlined
-            />
           </div>
         </div>
       </div>
@@ -327,7 +322,6 @@ const toast = useToast()
 
 const displayedReviews = ref<Review[]>(props.parkInfo?.reviews ? [...props.parkInfo.reviews] : [])
 
-// Keep displayedReviews in sync with the canonical parkInfo.reviews
 watch(
   () => props.parkInfo?.reviews,
   (r) => {
